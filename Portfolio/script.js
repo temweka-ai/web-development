@@ -22,3 +22,21 @@ const navLinks = document.getElementById("navLinks");
 menuBtn.addEventListener("click", () => {
     navLinks.classList.toggle("show");
 });
+
+const hiddenSections = document.querySelectorAll(".hidden");
+
+const observer = new IntersectionObserver((entries) => {
+
+    entries.forEach(entry => {
+
+        if(entry.isIntersecting){
+            entry.target.classList.add("show-section");
+        }
+
+    });
+
+});
+
+hiddenSections.forEach(section => {
+    observer.observe(section);
+});
