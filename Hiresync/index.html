@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- =========================================
+         BASIC DOCUMENT SETTINGS
+         Defines the character encoding and makes
+         the website responsive on different screens.
+         ========================================= -->
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <!-- =========================================
+         PAGE INFORMATION
+         Information shown in the browser tab and
+         used by search engines.
+         ========================================= -->
+
+    <meta name="description"
+          content="HireSync is a professional AI-powered job application tracker and career command center.">
+
+    <meta name="author"
+          content="Temweka Marivate">
+
+    <meta name="theme-color"
+          content="#0B0D12">
+
+    <title>HireSync | Job Application Command Center</title>
+
+
+    <!-- =========================================
+         CSS CONNECTION
+         Links our HTML page to style.css.
+         ========================================= -->
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+    <!-- =========================================
+         NAVIGATION
+         This will become the main navigation bar
+         for the HireSync application.
+         ========================================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Hire<span>Sync</span>
+        </div>
+
+        <div class="nav-links">
+
+            <a href="#" class="active">Dashboard</a>
+
+            <a href="#">Applications</a>
+
+            <a href="#">Interviews</a>
+
+            <a href="#">Analytics</a>
+
+        </div>
+
+        <div class="nav-user">
+            TM
+        </div>
+
+    </nav>
+
+
+    <!-- =========================================
+         MAIN APPLICATION
+         Everything inside <main> represents the
+         actual HireSync dashboard.
+         ========================================= -->
+
+    <main>
+
+
+        <!-- =========================================
+             DASHBOARD HEADER
+             Welcomes the user and introduces the
+             purpose of the dashboard.
+             ========================================= -->
+
+        <section class="dashboard-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    CAREER COMMAND CENTER
+                </p>
+
+                <h1>
+                    Good evening, Temweka.
+                </h1>
+
+                <p class="subtitle">
+                    Here's what's happening with your
+                    job search.
+                </p>
+
+            </div>
+
+            <button class="add-job-btn" id="open-modal">
+              + Add Application
+            </button>
+
+        </section>
+
+
+        <!-- =========================================
+             STATISTICS
+             These cards will eventually display
+             live information from our JavaScript.
+             ========================================= -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <p class="stat-label">
+                    TOTAL APPLICATIONS
+                </p>
+
+                <h2 id="total-applications">
+                    0
+                </h2>
+
+                <p class="stat-description">
+                    All tracked applications
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <p class="stat-label">
+                    ASSESMENTS
+                </p>
+
+                <h2 id="total-assessments">
+                    0
+                </h2>
+
+                <p class="stat-description">
+                    Assessments in progress
+                </p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <p class="stat-label">
+                  INTERVIEWS
+                </p>
+
+                <h2 id="total-interviews">
+                    0
+                </h2>
+
+                <p class="stat-description">
+                   Interviews secured
+                </p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <p class="stat-label">
+                    OFFERS
+                </p>
+
+                <h2 id="total-offers">
+                    0
+                </h2>
+
+                <p class="stat-description">
+                    Offers received
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <p class="stat-label">
+                    RESPONSE RATE
+                </p>
+
+                <h2 id="response-rate">
+                    0%
+                </h2>
+
+                <p class="stat-description">
+                    Employer responses
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             MAIN DASHBOARD GRID
+             Holds the application board and the
+             upcoming interviews panel.
+             ========================================= -->
+
+        <section class="dashboard-grid">
+
+
+            <!-- =====================================
+                 APPLICATION BOARD
+                 This will eventually become our
+                 interactive Kanban board.
+                 ===================================== -->
+
+            <div class="panel applications-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            APPLICATION PIPELINE
+                        </p>
+
+                        <h2>
+                            My Applications
+                        </h2>
+
+                    </div>
+
+                    <button class="view-all">
+                        View All
+                    </button>
+
+                </div>
+
+
+                <!--
+                    Kanban columns will be added here.
+
+                    Planned statuses:
+
+                    1. Applied
+                    2. Interview
+                    3. Assessment
+                    4. Offer
+                    5. Rejected
+                -->
+               <div class="application-controls">
+
+    <div class="search-box">
+
+        <span class="search-icon">⌕</span>
+
+        <input
+            type="text"
+            id="search-applications"
+            placeholder="Search applications..."
+        >
+
+    </div>
+
+
+    <div class="filter-box">
+
+        <label for="status-filter">
+            Status
+        </label>
+
+        <select id="status-filter">
+
+            <option value="All">
+                All Statuses
+            </option>
+
+            <option value="Applied">
+                Applied
+            </option>
+
+            <option value="Assessment">
+                Assessment
+            </option>
+
+            <option value="Interview">
+                Interview
+            </option>
+
+            <option value="Offer">
+                Offer
+            </option>
+
+            <option value="Rejected">
+                Rejected
+            </option>
+
+        </select>
+
+    </div>
+
+    </div>
+               <div class="kanban-board">
+
+    <!-- APPLIED -->
+
+    <div class="kanban-column">
+
+        <div class="column-header">
+            <span>Applied</span>
+            <span class="column-count">0</span>
+        </div>
+
+        <div class="application-list"></div>
+
+    </div>
+
+
+    <!-- ASSESSMENT -->
+
+    <div class="kanban-column">
+
+        <div class="column-header">
+            <span>Assessment</span>
+            <span class="column-count">0</span>
+        </div>
+
+        <div class="application-list"></div>
+
+    </div>
+
+
+    <!-- INTERVIEW -->
+
+    <div class="kanban-column">
+
+        <div class="column-header">
+            <span>Interview</span>
+            <span class="column-count">0</span>
+        </div>
+
+        <div class="application-list"></div>
+
+    </div>
+
+
+    <!-- OFFER -->
+
+    <div class="kanban-column">
+
+        <div class="column-header">
+            <span>Offer</span>
+            <span class="column-count">0</span>
+        </div>
+
+        <div class="application-list"></div>
+
+    </div>
+
+
+    <!-- REJECTED -->
+
+    <div class="kanban-column">
+
+        <div class="column-header">
+            <span>Rejected</span>
+            <span class="column-count">0</span>
+        </div>
+
+        <div class="application-list"></div>
+
+    </div>
+
+</div>
+
+            <!-- =====================================
+                 UPCOMING INTERVIEWS
+                 Shows interviews that are coming up.
+                 This will eventually be populated
+                 dynamically using JavaScript.
+                 ===================================== -->
+
+            <div class="panel interviews-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            SCHEDULE
+                        </p>
+
+                        <h2>
+                            Upcoming Interviews
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        +
+                    </div>
+
+                    <h3>
+                        No interviews yet
+                    </h3>
+
+                    <p>
+                        Interviews you add to HireSync
+                        will appear here.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             AI INBOX
+             This is currently a visual placeholder.
+
+             LATER:
+             Gmail/Outlook integration will allow
+             HireSync's AI to analyse incoming emails.
+             ========================================= -->
+
+        <section class="panel ai-inbox">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        AI INTELLIGENCE
+                    </p>
+
+                    <h2>
+                        Recruitment Inbox
+                    </h2>
+
+                </div>
+
+                <span class="ai-status">
+                    ● AI STANDBY
+                </span>
+
+            </div>
+
+
+            <div class="ai-empty">
+
+                <h3>
+                    Your recruitment intelligence
+                    will appear here.
+                </h3>
+
+                <p>
+                    HireSync will eventually analyse
+                    recruiter emails and automatically
+                    identify interviews, assessments,
+                    rejections and offers.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================
+         FOOTER
+         Basic project information.
+         ========================================= -->
+
+    <footer>
+
+        <p>
+            HireSync © 2026 Temweka Marivate
+        </p>
+
+        <p>
+            Career Command Center
+        </p>
+
+    </footer>
+
+
+    <!-- =========================================================
+     ADD APPLICATION MODAL
+     Hidden form that appears when the user wants to add
+     a new job application.
+     ========================================================= -->
+
+<div class="modal-overlay" id="application-modal">
+
+    <div class="modal">
+
+        <!-- Modal header -->
+
+        <div class="modal-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    NEW APPLICATION
+                </p>
+
+                <h2>
+                    Add Job Application
+                </h2>
+
+            </div>
+
+            <button
+                class="close-modal"
+                id="close-modal"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- Application form -->
+
+        <form id="application-form">
+
+            <div class="form-group">
+
+                <label for="company">
+                    Company
+                </label>
+
+                <input
+                    type="text"
+                    id="company"
+                    placeholder="e.g. Microsoft"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="role">
+                    Job Title
+                </label>
+
+                <input
+                    type="text"
+                    id="role"
+                    placeholder="e.g. Junior Front-End Developer"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="location">
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        placeholder="e.g. Johannesburg"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="status">
+                        Status
+                    </label>
+
+                   <select id="status">
+
+                       <option value="Applied">
+                           Applied
+                       </option>
+
+                       <option value="Assessment">
+                           Assessment
+                       </option>
+
+                       <option value="Interview">
+                           Interview
+                       </option>
+
+                       <option value="Offer">
+                           Offer
+                       </option>
+
+                       <option value="Rejected">
+                           Rejected
+                       </option>
+
+                    </select>
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="application-date">
+                    Application Date
+                </label>
+
+                <input
+                    type="date"
+                    id="application-date"
+                >
+
+            </div>
+
+            <div class="form-group">
+    <label for="salary">Salary</label>
+
+    <input
+        type="text"
+        id="salary"
+        placeholder="e.g. R15,000 per month"
+    >
+</div>
+
+<div class="form-group">
+    <label for="closing-date">Closing Date</label>
+
+    <input
+        type="date"
+        id="closing-date"
+    >
+</div>
+
+<div class="form-group">
+    <label for="job-url">Job URL</label>
+
+    <input
+        type="url"
+        id="job-url"
+        placeholder="https://..."
+    >
+</div>
+
+<div class="form-group">
+    <label for="notes">Notes</label>
+
+    <textarea
+        id="notes"
+        rows="4"
+        placeholder="Add any notes about this application..."
+    ></textarea>
+</div>
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    id="cancel-modal"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="submit-btn"
+                    id="submit-application"
+>
+                    Add Application
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+    <!-- =========================================
+         JAVASCRIPT CONNECTION
+         We load script.js at the bottom so the
+         HTML elements exist before JavaScript
+         tries to interact with them.
+         ========================================= -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

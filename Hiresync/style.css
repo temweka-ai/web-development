@@ -1,0 +1,1299 @@
+/* =========================================================
+   HIRESYNC — GLOBAL STYLES
+   This section controls the basic appearance of the
+   entire application.
+   ========================================================= */
+
+
+/* =========================================================
+   1. RESET
+   Removes default browser spacing so we control the layout.
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   2. ROOT VARIABLES
+   These are reusable values for our colours and styling.
+   Instead of repeatedly typing the same colour, we can
+   use variables such as --bg or --accent.
+   ========================================================= */
+
+:root {
+
+    --bg: #0B0D12;
+    --surface: #11141B;
+    --surface-light: #171B24;
+    --border: #242936;
+
+    --text: #F5F7FA;
+    --text-muted: #8D96A8;
+
+    --accent: #4F8CFF;
+    --accent-light: #78A8FF;
+
+    --success: #35D07F;
+    --warning: #F5B942;
+    --danger: #FF5C6C;
+
+    --radius: 14px;
+}
+
+
+/* =========================================================
+   3. BODY
+   Controls the overall page background, font and text.
+   ========================================================= */
+
+body {
+
+    background: var(--bg);
+    color: var(--text);
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    min-height: 100vh;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   4. NAVIGATION BAR
+   The main navigation across the top of HireSync.
+   ========================================================= */
+
+.navbar {
+
+    height: 72px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 40px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: rgba(11, 13, 18, 0.92);
+
+    position: sticky;
+    top: 0;
+
+    z-index: 100;
+
+    backdrop-filter: blur(12px);
+}
+
+
+/* =========================================================
+   5. LOGO
+   HireSync branding.
+   ========================================================= */
+
+.logo {
+
+    font-size: 21px;
+    font-weight: 800;
+
+    letter-spacing: -0.5px;
+}
+
+.logo span {
+
+    color: var(--accent);
+}
+
+
+/* =========================================================
+   6. NAVIGATION LINKS
+   Controls the Dashboard, Applications, Interviews and
+   Analytics links.
+   ========================================================= */
+
+.nav-links {
+
+    display: flex;
+    gap: 8px;
+}
+
+.nav-links a {
+
+    color: var(--text-muted);
+
+    text-decoration: none;
+
+    padding: 9px 14px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+.nav-links a:hover {
+
+    color: var(--text);
+    background: var(--surface);
+}
+
+.nav-links a.active {
+
+    color: var(--text);
+    background: var(--surface-light);
+}
+
+
+/* =========================================================
+   7. USER AVATAR
+   Small profile indicator in the navigation.
+   ========================================================= */
+
+.nav-user {
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: var(--surface-light);
+
+    border: 1px solid var(--border);
+
+    color: var(--accent-light);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   8. MAIN CONTENT
+   Gives the dashboard a controlled maximum width.
+   ========================================================= */
+
+main {
+
+    width: min(1400px, 92%);
+
+    margin: 0 auto;
+
+    padding: 50px 0 80px;
+}
+
+
+/* =========================================================
+   9. DASHBOARD HEADER
+   Contains the welcome message and Add Application button.
+   ========================================================= */
+
+.dashboard-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-end;
+
+    gap: 30px;
+
+    margin-bottom: 35px;
+}
+
+.eyebrow {
+
+    color: var(--accent);
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.8px;
+
+    margin-bottom: 8px;
+}
+
+.dashboard-header h1 {
+
+    font-size: clamp(30px, 4vw, 46px);
+
+    line-height: 1.1;
+
+    letter-spacing: -1.5px;
+}
+
+.subtitle {
+
+    color: var(--text-muted);
+
+    margin-top: 10px;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   10. ADD APPLICATION BUTTON
+   Primary action button for HireSync.
+   ========================================================= */
+
+.add-job-btn {
+
+    border: none;
+
+    background: var(--accent);
+
+    color: white;
+
+    padding: 12px 18px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.add-job-btn:hover {
+
+    background: var(--accent-light);
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   11. STATISTICS GRID
+   Four cards displaying the user's job-search metrics.
+   ========================================================= */
+
+.stats-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   12. STAT CARD
+   Individual application statistics.
+   ========================================================= */
+
+.stat-card {
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    padding: 22px;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.stat-card:hover {
+
+    transform: translateY(-3px);
+
+    border-color: #354052;
+}
+
+.stat-label {
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.4px;
+}
+
+.stat-card h2 {
+
+    font-size: 32px;
+
+    margin: 10px 0 4px;
+}
+
+.stat-description {
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   13. DASHBOARD GRID
+   Splits the main dashboard into two sections.
+   ========================================================= */
+
+.dashboard-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2fr)
+        minmax(300px, 1fr);
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   14. GENERIC PANEL
+   Shared styling for larger dashboard sections.
+   ========================================================= */
+
+.panel {
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   15. PANEL HEADER
+   Header shared by Applications, Interviews and AI Inbox.
+   ========================================================= */
+
+.panel-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 22px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-header h2 {
+
+    font-size: 18px;
+
+    letter-spacing: -0.3px;
+}
+
+.view-all {
+
+    background: transparent;
+
+    border: none;
+
+    color: var(--accent-light);
+
+    cursor: pointer;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   16. KANBAN BOARD
+   Creates the application pipeline columns.
+   ========================================================= */
+
+.kanban-board {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 12px;
+
+    padding: 18px;
+}
+
+.kanban-column {
+
+    min-width: 0;
+
+    background: #0D1016;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    min-height: 260px;
+}
+
+
+/* =========================================================
+   17. KANBAN COLUMN HEADER
+   Displays the status name and number of applications.
+   ========================================================= */
+
+.column-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 13px 14px;
+
+    border-bottom: 1px solid var(--border);
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.column-count {
+
+    color: var(--text-muted);
+
+    background: var(--surface-light);
+
+    padding: 2px 7px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   18. APPLICATION LIST
+   Empty space where JavaScript will eventually insert
+   real job application cards.
+   ========================================================= */
+
+.application-list {
+
+    padding: 10px;
+}
+
+
+/* =========================================================
+   19. EMPTY INTERVIEW STATE
+   Message shown when there are no upcoming interviews.
+   ========================================================= */
+
+.empty-state {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    min-height: 300px;
+
+    padding: 30px;
+}
+
+.empty-icon {
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px dashed #3A4250;
+
+    border-radius: 50%;
+
+    color: var(--text-muted);
+
+    margin-bottom: 15px;
+}
+
+.empty-state h3 {
+
+    font-size: 15px;
+
+    margin-bottom: 6px;
+}
+
+.empty-state p {
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    max-width: 220px;
+}
+
+
+/* =========================================================
+   20. AI INBOX
+   This is currently the visual foundation for the future
+   email-reading AI agent.
+   ========================================================= */
+
+.ai-inbox {
+
+    margin-top: 20px;
+}
+
+.ai-status {
+
+    color: var(--success);
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+.ai-empty {
+
+    padding: 30px 22px;
+}
+
+.ai-empty h3 {
+
+    font-size: 16px;
+
+    margin-bottom: 8px;
+}
+
+.ai-empty p {
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+
+    max-width: 650px;
+}
+
+
+/* =========================================================
+   21. FOOTER
+   ========================================================= */
+
+footer {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 25px 4%;
+
+    border-top: 1px solid var(--border);
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   22. RESPONSIVE DESIGN
+   Adjusts the dashboard for tablets and smaller screens.
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .dashboard-grid {
+
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   23. MOBILE NAVIGATION
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .navbar {
+
+        padding: 0 18px;
+    }
+
+    .nav-links {
+
+        display: none;
+    }
+
+    main {
+
+        width: 94%;
+
+        padding-top: 35px;
+    }
+
+    .dashboard-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .add-job-btn {
+
+        width: 100%;
+    }
+
+    .stats-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .kanban-board {
+
+        grid-template-columns: 1fr;
+
+        overflow-x: visible;
+    }
+
+    .kanban-column {
+
+        min-height: 180px;
+    }
+
+    footer {
+
+        flex-direction: column;
+
+        text-align: center;
+    }
+}
+
+/* =========================================================
+   APPLICATION CARDS
+   These cards are created dynamically by JavaScript.
+   ========================================================= */
+
+.application-card {
+
+    background: var(--surface-light);
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    padding: 14px;
+
+    margin-bottom: 10px;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.application-card:hover {
+
+    transform: translateY(-2px);
+
+    border-color: #3B4658;
+}
+
+.application-card h3 {
+
+    font-size: 13px;
+
+    margin-bottom: 4px;
+}
+
+.application-card p {
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+
+    margin-bottom: 10px;
+}
+
+.application-card span {
+
+    display: inline-block;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.8px;
+
+    color: var(--accent-light);
+
+    background: rgba(79, 140, 255, 0.1);
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+}
+
+/* =========================================================
+   ADD APPLICATION MODAL
+   Controls the pop-up form used to create applications.
+   ========================================================= */
+
+.modal-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.72);
+
+    backdrop-filter: blur(8px);
+
+    z-index: 1000;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+
+.modal-overlay.active {
+
+    opacity: 1;
+
+    visibility: visible;
+}
+
+
+.modal {
+    width: min(560px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.45);
+    transform: translateY(15px);
+    transition: transform 0.25s ease;
+}
+
+
+.modal-overlay.active .modal {
+
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.modal-header {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    padding: 24px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+
+.modal-header h2 {
+
+    font-size: 20px;
+}
+
+
+.close-modal {
+
+    width: 32px;
+
+    height: 32px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 8px;
+
+    background: var(--surface-light);
+
+    color: var(--text-muted);
+
+    font-size: 22px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.close-modal:hover {
+
+    color: var(--text);
+
+    background: #202530;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+#application-form {
+
+    padding: 24px;
+}
+
+
+.form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-bottom: 18px;
+}
+
+
+.form-group label {
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+}
+
+
+.form-group input,
+.form-group select {
+
+    width: 100%;
+
+    padding: 12px 13px;
+
+    background: #0D1016;
+
+    border: 1px solid var(--border);
+
+    border-radius: 8px;
+
+    color: var(--text);
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+
+    border-color: var(--accent);
+
+    box-shadow:
+        0 0 0 3px rgba(79, 140, 255, 0.1);
+}
+
+
+.form-group input::placeholder {
+
+    color: #596274;
+}
+
+
+.form-row {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 14px;
+}
+
+
+/* =========================================================
+   FORM BUTTONS
+   ========================================================= */
+
+.form-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 8px;
+}
+
+
+.cancel-btn,
+.submit-btn {
+
+    padding: 11px 17px;
+
+    border-radius: 8px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.cancel-btn {
+
+    background: transparent;
+
+    border: 1px solid var(--border);
+
+    color: var(--text-muted);
+}
+
+
+.cancel-btn:hover {
+
+    background: var(--surface-light);
+
+    color: var(--text);
+}
+
+
+.submit-btn {
+
+    background: var(--accent);
+
+    border: 1px solid var(--accent);
+
+    color: white;
+}
+
+
+.submit-btn:hover {
+
+    background: var(--accent-light);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   MOBILE MODAL
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .form-row {
+
+        grid-template-columns: 1fr;
+    }
+
+    .modal-header,
+    #application-form {
+
+        padding: 20px;
+    }
+
+    .form-actions {
+
+        flex-direction: column-reverse;
+    }
+
+    .cancel-btn,
+    .submit-btn {
+
+        width: 100%;
+    }
+}
+
+/* =========================================
+   APPLICATION CARD HEADER
+   ========================================= */
+
+.application-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.application-card-header h3 {
+    margin: 0;
+}
+
+
+/* =========================================
+   APPLICATION STATUS
+   ========================================= */
+
+.application-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: rgba(79, 140, 255, 0.12);
+    color: var(--accent-light);
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   APPLICATION DETAILS
+   ========================================= */
+
+.application-location,
+.application-date {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.application-salary,
+.application-closing-date,
+.application-url,
+.application-notes {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.application-salary {
+    font-weight: 600;
+}
+
+.application-url a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.application-url a:hover {
+    text-decoration: underline;
+}
+
+.application-notes {
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    white-space: pre-wrap;
+}
+
+
+/* =========================================
+   APPLICATION ACTIONS
+   ========================================= */
+
+.application-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.application-actions button {
+    border: none;
+    border-radius: 7px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+
+/* Edit button */
+
+.edit-btn {
+    background: var(--surface-light);
+    color: var(--text);
+    border: 1px solid var(--border) !important;
+}
+
+.edit-btn:hover {
+    border-color: var(--accent) !important;
+    color: var(--accent-light);
+}
+
+
+/* Delete button */
+
+.delete-btn {
+    background: rgba(255, 92, 108, 0.1);
+    color: var(--danger);
+}
+
+.delete-btn:hover {
+    background: rgba(255, 92, 108, 0.18);
+}
+
+/* =========================================
+   DRAG & DROP
+========================================= */
+
+.application-card{
+    cursor:grab;
+    transition:.25s;
+}
+
+.application-card:active{
+    cursor:grabbing;
+}
+
+.application-card.dragging{
+    opacity:.45;
+    transform:rotate(2deg) scale(.98);
+}
+
+.application-list{
+    min-height:140px;
+    transition:.2s;
+}
+
+.application-list:hover{
+    background:rgba(255,255,255,.02);
+    border-radius:12px;
+}
+
+/* =========================================
+   APPLICATION STATUS BADGES
+   ========================================= */
+
+.application-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+
+/* Applied */
+
+.status-applied {
+    background: rgba(100, 116, 139, 0.15);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+
+/* Assessment */
+
+.status-assessment {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(192, 132, 252, 0.25);
+}
+
+
+/* Interview */
+
+.status-interview {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+
+/* Offer */
+
+.status-offer {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.25);
+}
+
+
+/* Rejected */
+
+.status-rejected {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.25);
+}
