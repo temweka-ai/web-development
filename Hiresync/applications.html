@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Applications | HireSync</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            Hire<span>Sync</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="applications.html" class="active">Applications</a>
+        </div>
+
+        <div class="nav-user">
+            TM
+        </div>
+    </nav>
+    
+    <main>
+
+        <section class="page-header">
+            <div>
+                <p class="eyebrow">APPLICATION MANAGEMENT</p>
+
+                <h1>Applications</h1>
+
+                <p class="subtitle">
+                    Track, organize, and manage your job applications.
+                </p>
+            </div>
+
+            <button class="add-job-btn" id="addApplicationBtn">
+                + Add Application
+            </button>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2>All Applications</h2>
+                    <p class="panel-description">
+                        Your complete job application history.
+                    </p>
+                </div>
+            </div>
+
+            <div class="application-controls">
+
+                <div class="search-box">
+                    <span class="search-icon">⌕</span>
+
+                    <input
+                        type="text"
+                        id="applicationSearch"
+                        placeholder="Search applications..."
+                    >
+                </div>
+
+                <div class="filter-box">
+                    <label for="applicationFilter">
+                        Status
+                    </label>
+
+                    <select id="applicationFilter">
+                        <option value="all">All</option>
+                        <option value="Applied">Applied</option>
+                        <option value="Assessment">Assessment</option>
+                        <option value="Interview">Interview</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div id="applicationsList">
+                <!-- Applications will appear here -->
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>HireSync © 2026 Temweka Marivate</p>
+        <p>Career Command Center</p>
+    </footer>
+
+</body>
+</html>

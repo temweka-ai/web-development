@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +8,7 @@
         name="description"
         content="HireSync is a professional AI-powered job application tracker and career command center."
     >
+
     <meta name="author" content="Temweka Marivate">
     <meta name="theme-color" content="#0B0D12">
 
@@ -21,13 +21,14 @@
 
     <!-- Navigation -->
     <nav class="navbar">
+
         <div class="logo">
             Hire<span>Sync</span>
         </div>
 
         <div class="nav-links">
-            <a href="#" class="active">Dashboard</a>
-            <a href="#">Applications</a>
+            <a href="index.html" class="active">Dashboard</a>
+            <a href="applications.html">Applications</a>
             <a href="#">Interviews</a>
             <a href="#">Analytics</a>
         </div>
@@ -35,12 +36,15 @@
         <div class="nav-user">
             TM
         </div>
+
     </nav>
+
 
     <main>
 
         <!-- Dashboard Header -->
         <section class="dashboard-header">
+
             <div>
                 <p class="eyebrow">CAREER COMMAND CENTER</p>
 
@@ -54,7 +58,9 @@
             <button class="add-job-btn" id="open-modal">
                 + Add Application
             </button>
+
         </section>
+
 
         <!-- Statistics -->
         <section class="stats-grid">
@@ -69,6 +75,7 @@
                 </p>
             </div>
 
+
             <div class="stat-card">
                 <p class="stat-label">ASSESSMENTS</p>
 
@@ -78,6 +85,7 @@
                     Assessments in progress
                 </p>
             </div>
+
 
             <div class="stat-card">
                 <p class="stat-label">INTERVIEWS</p>
@@ -89,6 +97,7 @@
                 </p>
             </div>
 
+
             <div class="stat-card">
                 <p class="stat-label">OFFERS</p>
 
@@ -98,6 +107,7 @@
                     Offers received
                 </p>
             </div>
+
 
             <div class="stat-card">
                 <p class="stat-label">RESPONSE RATE</p>
@@ -111,6 +121,7 @@
 
         </section>
 
+
         <!-- Main Dashboard -->
         <section class="dashboard-grid">
 
@@ -118,20 +129,24 @@
             <div class="panel applications-panel">
 
                 <div class="panel-header">
+
                     <div>
                         <p class="eyebrow">APPLICATION PIPELINE</p>
                         <h2>My Applications</h2>
                     </div>
 
-                    <button class="view-all">
+                    <button class="view-all" type="button">
                         View All
                     </button>
+
                 </div>
+
 
                 <!-- Search and Filter -->
                 <div class="application-controls">
 
                     <div class="search-box">
+
                         <span class="search-icon">⌕</span>
 
                         <input
@@ -139,93 +154,136 @@
                             id="search-applications"
                             placeholder="Search applications..."
                         >
+
                     </div>
 
+
                     <div class="filter-box">
+
                         <label for="status-filter">
                             Status
                         </label>
 
                         <select id="status-filter">
-                            <option value="All">All Statuses</option>
-                            <option value="Applied">Applied</option>
-                            <option value="Assessment">Assessment</option>
-                            <option value="Interview">Interview</option>
-                            <option value="Offer">Offer</option>
-                            <option value="Rejected">Rejected</option>
+
+                            <option value="All">
+                                All Statuses
+                            </option>
+
+                            <option value="Applied">
+                                Applied
+                            </option>
+
+                            <option value="Assessment">
+                                Assessment
+                            </option>
+
+                            <option value="Interview">
+                                Interview
+                            </option>
+
+                            <option value="Offer">
+                                Offer
+                            </option>
+
+                            <option value="Rejected">
+                                Rejected
+                            </option>
+
                         </select>
+
                     </div>
 
                 </div>
+
 
                 <!-- Kanban Board -->
                 <div class="kanban-board">
 
                     <!-- Applied -->
                     <div class="kanban-column">
+
                         <div class="column-header">
                             <span>Applied</span>
                             <span class="column-count">0</span>
                         </div>
 
                         <div class="application-list"></div>
+
                     </div>
+
 
                     <!-- Assessment -->
                     <div class="kanban-column">
+
                         <div class="column-header">
                             <span>Assessment</span>
                             <span class="column-count">0</span>
                         </div>
 
                         <div class="application-list"></div>
+
                     </div>
+
 
                     <!-- Interview -->
                     <div class="kanban-column">
+
                         <div class="column-header">
                             <span>Interview</span>
                             <span class="column-count">0</span>
                         </div>
 
                         <div class="application-list"></div>
+
                     </div>
+
 
                     <!-- Offer -->
                     <div class="kanban-column">
+
                         <div class="column-header">
                             <span>Offer</span>
                             <span class="column-count">0</span>
                         </div>
 
                         <div class="application-list"></div>
+
                     </div>
+
 
                     <!-- Rejected -->
                     <div class="kanban-column">
+
                         <div class="column-header">
                             <span>Rejected</span>
                             <span class="column-count">0</span>
                         </div>
 
                         <div class="application-list"></div>
+
                     </div>
 
                 </div>
 
             </div>
 
+
             <!-- Upcoming Interviews -->
             <div class="panel interviews-panel">
 
                 <div class="panel-header">
+
                     <div>
                         <p class="eyebrow">SCHEDULE</p>
                         <h2>Upcoming Interviews</h2>
                     </div>
+
                 </div>
 
+
                 <div class="empty-state">
+
                     <div class="empty-icon">
                         +
                     </div>
@@ -235,16 +293,19 @@
                     <p>
                         Interviews you add to HireSync will appear here.
                     </p>
+
                 </div>
 
             </div>
 
         </section>
 
+
         <!-- AI Inbox -->
         <section class="panel ai-inbox">
 
             <div class="panel-header">
+
                 <div>
                     <p class="eyebrow">AI INTELLIGENCE</p>
                     <h2>Recruitment Inbox</h2>
@@ -253,9 +314,12 @@
                 <span class="ai-status">
                     ● AI STANDBY
                 </span>
+
             </div>
 
+
             <div class="ai-empty">
+
                 <h3>
                     Your recruitment intelligence will appear here.
                 </h3>
@@ -265,17 +329,23 @@
                     and automatically identify interviews, assessments,
                     rejections and offers.
                 </p>
+
             </div>
 
         </section>
 
     </main>
 
+
     <!-- Footer -->
     <footer>
+
         <p>HireSync © 2026 Temweka Marivate</p>
+
         <p>Career Command Center</p>
+
     </footer>
+
 
     <!-- Add/Edit Application Modal -->
     <div class="modal-overlay" id="application-modal">
@@ -283,6 +353,7 @@
         <div class="modal">
 
             <div class="modal-header">
+
                 <div>
                     <p class="eyebrow">NEW APPLICATION</p>
                     <h2>Add Job Application</h2>
@@ -295,13 +366,18 @@
                 >
                     ×
                 </button>
+
             </div>
+
 
             <!-- Application Form -->
             <form id="application-form">
 
                 <div class="form-group">
-                    <label for="company">Company</label>
+
+                    <label for="company">
+                        Company
+                    </label>
 
                     <input
                         type="text"
@@ -309,10 +385,15 @@
                         placeholder="e.g. Microsoft"
                         required
                     >
+
                 </div>
 
+
                 <div class="form-group">
-                    <label for="role">Job Title</label>
+
+                    <label for="role">
+                        Job Title
+                    </label>
 
                     <input
                         type="text"
@@ -320,35 +401,64 @@
                         placeholder="e.g. Junior Front-End Developer"
                         required
                     >
+
                 </div>
+
 
                 <div class="form-row">
 
                     <div class="form-group">
-                        <label for="location">Location</label>
+
+                        <label for="location">
+                            Location
+                        </label>
 
                         <input
                             type="text"
                             id="location"
                             placeholder="e.g. Johannesburg"
                         >
+
                     </div>
 
+
                     <div class="form-group">
-                        <label for="status">Status</label>
+
+                        <label for="status">
+                            Status
+                        </label>
 
                         <select id="status">
-                            <option value="Applied">Applied</option>
-                            <option value="Assessment">Assessment</option>
-                            <option value="Interview">Interview</option>
-                            <option value="Offer">Offer</option>
-                            <option value="Rejected">Rejected</option>
+
+                            <option value="Applied">
+                                Applied
+                            </option>
+
+                            <option value="Assessment">
+                                Assessment
+                            </option>
+
+                            <option value="Interview">
+                                Interview
+                            </option>
+
+                            <option value="Offer">
+                                Offer
+                            </option>
+
+                            <option value="Rejected">
+                                Rejected
+                            </option>
+
                         </select>
+
                     </div>
 
                 </div>
 
+
                 <div class="form-group">
+
                     <label for="application-date">
                         Application Date
                     </label>
@@ -357,46 +467,68 @@
                         type="date"
                         id="application-date"
                     >
+
                 </div>
 
+
                 <div class="form-group">
-                    <label for="salary">Salary</label>
+
+                    <label for="salary">
+                        Salary
+                    </label>
 
                     <input
                         type="text"
                         id="salary"
                         placeholder="e.g. R15,000 per month"
                     >
+
                 </div>
 
+
                 <div class="form-group">
-                    <label for="closing-date">Closing Date</label>
+
+                    <label for="closing-date">
+                        Closing Date
+                    </label>
 
                     <input
                         type="date"
                         id="closing-date"
                     >
+
                 </div>
 
+
                 <div class="form-group">
-                    <label for="job-url">Job URL</label>
+
+                    <label for="job-url">
+                        Job URL
+                    </label>
 
                     <input
                         type="url"
                         id="job-url"
                         placeholder="https://..."
                     >
+
                 </div>
 
+
                 <div class="form-group">
-                    <label for="notes">Notes</label>
+
+                    <label for="notes">
+                        Notes
+                    </label>
 
                     <textarea
                         id="notes"
                         rows="4"
                         placeholder="Add any notes about this application..."
                     ></textarea>
+
                 </div>
+
 
                 <div class="form-actions">
 
@@ -423,6 +555,7 @@
         </div>
 
     </div>
+
 
     <script src="script.js"></script>
 

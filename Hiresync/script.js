@@ -1,6 +1,12 @@
-/* HireSync JavaScript */
+/* =========================================================
+   HIRESYNC JAVASCRIPT
+   ========================================================= */
 
-// Demo applications
+
+/* =========================================================
+   DEMO APPLICATIONS
+   ========================================================= */
+
 const defaultApplications = [
     {
         id: 1,
@@ -10,6 +16,7 @@ const defaultApplications = [
         status: "Applied",
         applicationDate: ""
     },
+
     {
         id: 2,
         company: "Takealot",
@@ -18,6 +25,7 @@ const defaultApplications = [
         status: "Interview",
         applicationDate: ""
     },
+
     {
         id: 3,
         company: "TymeBank",
@@ -28,17 +36,30 @@ const defaultApplications = [
     }
 ];
 
-// Load saved applications or use demo data
-const savedApplications = localStorage.getItem("hiresyncApplications");
+
+/* =========================================================
+   LOAD SAVED APPLICATIONS
+   ========================================================= */
+
+const savedApplications =
+    localStorage.getItem("hiresyncApplications");
 
 let applications = savedApplications
     ? JSON.parse(savedApplications)
     : defaultApplications;
 
-// Tracks the application currently being edited
+
+/* =========================================================
+   EDITING STATE
+   ========================================================= */
+
 let editingApplicationId = null;
 
-// Save applications to Local Storage
+
+/* =========================================================
+   SAVE APPLICATIONS
+   ========================================================= */
+
 function saveApplications() {
     localStorage.setItem(
         "hiresyncApplications",
@@ -46,7 +67,11 @@ function saveApplications() {
     );
 }
 
-// Dashboard elements
+
+/* =========================================================
+   DASHBOARD ELEMENTS
+   ========================================================= */
+
 const totalApplications =
     document.querySelector("#total-applications");
 
@@ -68,104 +93,163 @@ const searchApplications =
 const statusFilter =
     document.querySelector("#status-filter");
 
-// Search and filter
-searchApplications.addEventListener("input", () => {
-    renderApplications();
-});
 
-statusFilter.addEventListener("change", () => {
-    renderApplications();
-});
+/* =========================================================
+   SEARCH AND FILTER
+   ========================================================= */
 
-// Update dashboard statistics
+if (searchApplications && statusFilter) {
+    searchApplications.addEventListener("input", () => {
+        renderApplications();
+    });
+
+    statusFilter.addEventListener("change", () => {
+        renderApplications();
+    });
+}
+
+
+/* =========================================================
+   UPDATE DASHBOARD STATISTICS
+   ========================================================= */
+
 function updateStatistics() {
+
     const assessments = applications.filter(
-        application => application.status === "Assessment"
+        application =>
+            application.status === "Assessment"
     );
 
-    totalAssessments.textContent = assessments.length;
+    totalAssessments.textContent =
+        assessments.length;
 
-    totalApplications.textContent = applications.length;
+
+    totalApplications.textContent =
+        applications.length;
+
 
     const interviews = applications.filter(
-        application => application.status === "Interview"
+        application =>
+            application.status === "Interview"
     );
 
-    totalInterviews.textContent = interviews.length;
+    totalInterviews.textContent =
+        interviews.length;
+
 
     const offers = applications.filter(
-        application => application.status === "Offer"
+        application =>
+            application.status === "Offer"
     );
 
-    totalOffers.textContent = offers.length;
+    totalOffers.textContent =
+        offers.length;
+
 
     const responses = applications.filter(
-        application => application.status !== "Applied"
+        application =>
+            application.status !== "Applied"
     );
 
+
     if (applications.length > 0) {
+
         const rate = Math.round(
             (responses.length / applications.length) * 100
         );
 
-        responseRate.textContent = `${rate}%`;
+        responseRate.textContent =
+            `${rate}%`;
+
     } else {
-        responseRate.textContent = "0%";
+
+        responseRate.textContent =
+            "0%";
     }
 }
 
-// Kanban columns
+
+/* =========================================================
+   KANBAN COLUMNS
+   ========================================================= */
+
 const kanbanColumns =
     document.querySelectorAll(".kanban-column");
 
-// Render application cards
-function renderApplications() {
-    document.querySelectorAll(".application-list").forEach(list => {
-        list.innerHTML = "";
-    });
+/* =========================================================
+   APPLICATIONS PAGE
+   ========================================================= */
+
+const applicationsPageList =
+    document.querySelector("#applicationsList");
+
+const applicationsPageSearch =
+    document.querySelector("#applicationSearch");
+
+const applicationsPageFilter =
+    document.querySelector("#applicationFilter");
+
+function renderApplicationsPage() {
+
+    if (!applicationsPageList) {
+        return;
+    }
 
     const searchTerm =
-        searchApplications.value.toLowerCase().trim();
+        applicationsPageSearch.value
+            .toLowerCase()
+            .trim();
 
     const selectedStatus =
-        statusFilter.value;
+        applicationsPageFilter.value;
 
     const filteredApplications =
         applications.filter(application => {
+
             const matchesSearch =
                 application.company
                     .toLowerCase()
-                    .includes(searchTerm) ||
-
+                    .includes(searchTerm)
+                ||
                 application.role
                     .toLowerCase()
-                    .includes(searchTerm) ||
-
+                    .includes(searchTerm)
+                ||
                 (application.location || "")
                     .toLowerCase()
                     .includes(searchTerm);
 
             const matchesStatus =
-                selectedStatus === "All" ||
+                selectedStatus === "all"
+                ||
                 application.status === selectedStatus;
 
-            return matchesSearch && matchesStatus;
+            return (
+                matchesSearch &&
+                matchesStatus
+            );
         });
 
+    applicationsPageList.innerHTML = "";
+
     filteredApplications.forEach(application => {
-        const card = document.createElement("div");
 
-        card.className = "application-card";
-        card.draggable = true;
-        card.dataset.id = application.id;
+        const card =
+            document.createElement("div");
 
-        const statusClass = application.status
-            .toLowerCase()
-            .replace(/\s+/g, "-");
+        card.className =
+            "application-card";
+
+        const statusClass =
+            application.status
+                .toLowerCase()
+                .replace(/\s+/g, "-");
 
         card.innerHTML = `
             <div class="application-card-header">
-                <h3>${application.company}</h3>
+                <h3>
+                    ${application.company}
+                </h3>
 
                 <span class="application-status status-${statusClass}">
                     ${application.status}
@@ -244,6 +328,7 @@ function renderApplications() {
             }
 
             <div class="application-actions">
+
                 <button
                     class="edit-btn"
                     data-id="${application.id}"
@@ -257,57 +342,322 @@ function renderApplications() {
                 >
                     Delete
                 </button>
+
             </div>
         `;
 
-        // Drag start
-        card.addEventListener("dragstart", event => {
-            card.classList.add("dragging");
+        applicationsPageList.appendChild(card);
+    });
+}
 
-            event.dataTransfer.setData(
-                "text/plain",
-                application.id
+if (
+    applicationsPageSearch &&
+    applicationsPageFilter
+) {
+    applicationsPageSearch.addEventListener(
+        "input",
+        renderApplicationsPage
+    );
+
+    applicationsPageFilter.addEventListener(
+        "change",
+        renderApplicationsPage
+    );
+}
+
+/* =========================================================
+   RENDER APPLICATION CARDS
+   ========================================================= */
+
+function renderApplications() {
+
+    document
+        .querySelectorAll(".application-list")
+        .forEach(list => {
+
+            list.innerHTML = "";
+
+        });
+
+
+    const searchTerm =
+        searchApplications.value
+            .toLowerCase()
+            .trim();
+
+
+    const selectedStatus =
+        statusFilter.value;
+
+
+    const filteredApplications =
+        applications.filter(application => {
+
+            const matchesSearch =
+                application.company
+                    .toLowerCase()
+                    .includes(searchTerm)
+
+                ||
+
+                application.role
+                    .toLowerCase()
+                    .includes(searchTerm)
+
+                ||
+
+                (application.location || "")
+                    .toLowerCase()
+                    .includes(searchTerm);
+
+
+            const matchesStatus =
+                selectedStatus === "All"
+                ||
+                application.status === selectedStatus;
+
+
+            return (
+                matchesSearch &&
+                matchesStatus
             );
-
-            event.dataTransfer.effectAllowed = "move";
         });
 
-        // Drag end
-        card.addEventListener("dragend", () => {
-            card.classList.remove("dragging");
-        });
+
+    filteredApplications.forEach(application => {
+
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "application-card";
+
+
+        card.draggable =
+            true;
+
+
+        card.dataset.id =
+            application.id;
+
+
+        const statusClass =
+            application.status
+                .toLowerCase()
+                .replace(/\s+/g, "-");
+
+
+        card.innerHTML = `
+
+            <div class="application-card-header">
+
+                <h3>
+                    ${application.company}
+                </h3>
+
+                <span class="application-status status-${statusClass}">
+                    ${application.status}
+                </span>
+
+            </div>
+
+
+            <p class="application-role">
+                ${application.role}
+            </p>
+
+
+            ${
+                application.location
+                    ? `
+                        <p class="application-location">
+                            📍 ${application.location}
+                        </p>
+                    `
+                    : ""
+            }
+
+
+            ${
+                application.applicationDate
+                    ? `
+                        <p class="application-date">
+                            📅 ${application.applicationDate}
+                        </p>
+                    `
+                    : ""
+            }
+
+
+            ${
+                application.salary
+                    ? `
+                        <p class="application-salary">
+                            💰 ${application.salary}
+                        </p>
+                    `
+                    : ""
+            }
+
+
+            ${
+                application.closingDate
+                    ? `
+                        <p class="application-closing-date">
+                            ⏳ Closes: ${application.closingDate}
+                        </p>
+                    `
+                    : ""
+            }
+
+
+            ${
+                application.jobUrl
+                    ? `
+                        <p class="application-url">
+
+                            🔗
+
+                            <a
+                                href="${application.jobUrl}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                View Job Posting
+                            </a>
+
+                        </p>
+                    `
+                    : ""
+            }
+
+
+            ${
+                application.notes
+                    ? `
+                        <p class="application-notes">
+                            📝 ${application.notes}
+                        </p>
+                    `
+                    : ""
+            }
+
+
+            <div class="application-actions">
+
+                <button
+                    class="edit-btn"
+                    data-id="${application.id}"
+                >
+                    Edit
+                </button>
+
+                <button
+                    class="delete-btn"
+                    data-id="${application.id}"
+                >
+                    Delete
+                </button>
+
+            </div>
+
+        `;
+
+
+        /* Drag start */
+        card.addEventListener(
+            "dragstart",
+            event => {
+
+                card.classList.add("dragging");
+
+                event.dataTransfer.setData(
+                    "text/plain",
+                    application.id
+                );
+
+                event.dataTransfer.effectAllowed =
+                    "move";
+            }
+        );
+
+
+        /* Drag end */
+        card.addEventListener(
+            "dragend",
+            () => {
+
+                card.classList.remove(
+                    "dragging"
+                );
+
+            }
+        );
+
 
         const targetColumn =
-            [...kanbanColumns].find(column => {
-                return (
-                    column
-                        .querySelector(".column-header span")
-                        .textContent
-                        .trim() === application.status
-                );
-            });
+            [...kanbanColumns].find(
+                column => {
 
-        targetColumn
-            .querySelector(".application-list")
-            .appendChild(card);
+                    return (
+                        column
+                            .querySelector(
+                                ".column-header span"
+                            )
+                            .textContent
+                            .trim()
+                        ===
+                        application.status
+                    );
+
+                }
+            );
+
+
+        if (targetColumn) {
+
+            targetColumn
+                .querySelector(".application-list")
+                .appendChild(card);
+
+        }
+
     });
+
 
     updateColumnCounts();
 }
 
-// Update Kanban column counters
+
+/* =========================================================
+   UPDATE KANBAN COUNTERS
+   ========================================================= */
+
 function updateColumnCounts() {
+
     kanbanColumns.forEach(column => {
+
         const columnTitle =
-            column.querySelector(".column-header span");
+            column.querySelector(
+                ".column-header span"
+            );
+
 
         const count =
-            column.querySelector(".column-count");
+            column.querySelector(
+                ".column-count"
+            );
 
-        if (!columnTitle || !count) return;
+
+        if (!columnTitle || !count) {
+            return;
+        }
+
 
         const status =
             columnTitle.textContent.trim();
+
 
         const number =
             applications.filter(
@@ -315,279 +665,677 @@ function updateColumnCounts() {
                     application.status === status
             ).length;
 
-        count.textContent = number;
+
+        count.textContent =
+            number;
+
     });
 }
 
-// Drag and drop
+
+/* =========================================================
+   DRAG AND DROP
+   ========================================================= */
+
 document
-    .querySelectorAll(".application-list")
-    .forEach(list => {
-        list.addEventListener("dragover", event => {
-            event.preventDefault();
-        });
+    .querySelectorAll(".kanban-column")
+    .forEach(column => {
 
-        list.addEventListener("drop", event => {
-            event.preventDefault();
+        column.addEventListener(
+            "dragover",
+            event => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+            }
+        );
 
-            const id = Number(
-                event.dataTransfer.getData("text/plain")
-            );
+        column.addEventListener(
+            "drop",
+            event => {
 
-            const application =
-                applications.find(app => app.id === id);
+                event.preventDefault();
 
-            if (!application) return;
+                const id =
+                    Number(
+                        event.dataTransfer.getData(
+                            "text/plain"
+                        )
+                    );
 
-            const newStatus = list
-                .closest(".kanban-column")
-                .querySelector(".column-header span")
-                .textContent
-                .trim();
+                const application =
+                    applications.find(
+                        app => app.id === id
+                    );
 
-            application.status = newStatus;
+                if (!application) {
+                    return;
+                }
 
-            saveApplications();
-            updateStatistics();
-            renderApplications();
-        });
+                const columnTitle =
+                    column.querySelector(
+                        ".column-header span"
+                    );
+
+                if (!columnTitle) {
+                    return;
+                }
+
+                const newStatus =
+                    columnTitle.textContent.trim();
+
+                application.status =
+                    newStatus;
+
+                saveApplications();
+
+                renderApplications();
+
+                updateStatistics();
+
+                updateColumnCounts();
+
+                renderApplicationsPage();
+
+                updateAIInbox();
+            }
+        );
     });
 
-// Initial dashboard load
-updateStatistics();
-renderApplications();
-updateColumnCounts();
 
-// Application modal
-const modal =
-    document.querySelector("#application-modal");
+/* =========================================================
+   AI INBOX
+   ========================================================= */
 
-const openModalButton =
-    document.querySelector("#open-modal");
+function updateAIInbox() {
 
-const closeModalButton =
-    document.querySelector("#close-modal");
+    const aiInbox =
+        document.querySelector("#ai-inbox");
 
-const cancelModalButton =
-    document.querySelector("#cancel-modal");
 
-// Open modal
-openModalButton.addEventListener("click", () => {
-    applicationForm.reset();
-
-    editingApplicationId = null;
-
-    document.querySelector(
-        ".modal-header h2"
-    ).textContent = "Add Job Application";
-
-    document.querySelector(
-        "#submit-application"
-    ).textContent = "Add Application";
-
-    modal.classList.add("active");
-});
-
-// Close modal
-closeModalButton.addEventListener("click", () => {
-    modal.classList.remove("active");
-});
-
-// Cancel form
-cancelModalButton.addEventListener("click", () => {
-    modal.classList.remove("active");
-});
-
-// Close modal when clicking outside
-modal.addEventListener("click", event => {
-    if (event.target === modal) {
-        modal.classList.remove("active");
-    }
-});
-
-// Application form
-const applicationForm =
-    document.querySelector("#application-form");
-
-applicationForm.addEventListener("submit", event => {
-    event.preventDefault();
-
-    // Get form values
-    const company =
-        document.querySelector("#company").value.trim();
-
-    const role =
-        document.querySelector("#role").value.trim();
-
-    const location =
-        document.querySelector("#location").value.trim();
-
-    const status =
-        document.querySelector("#status").value;
-
-    const applicationDate =
-        document.querySelector("#application-date").value;
-
-    const salary =
-        document.querySelector("#salary").value.trim();
-
-    const closingDate =
-        document.querySelector("#closing-date").value;
-
-    const jobUrl =
-        document.querySelector("#job-url").value.trim();
-
-    const notes =
-        document.querySelector("#notes").value.trim();
-
-    // Edit existing application
-    if (editingApplicationId !== null) {
-        const application =
-            applications.find(
-                application =>
-                    application.id === editingApplicationId
-            );
-
-        if (application) {
-            application.company = company;
-            application.role = role;
-            application.location = location;
-            application.status = status;
-            application.applicationDate = applicationDate;
-            application.salary = salary;
-            application.closingDate = closingDate;
-            application.jobUrl = jobUrl;
-            application.notes = notes;
-        }
-
-        saveApplications();
-
-    } else {
-        // Create new application
-        const newApplication = {
-            id: Date.now(),
-            company: company,
-            role: role,
-            location: location,
-            status: status,
-            applicationDate: applicationDate,
-            salary: salary,
-            closingDate: closingDate,
-            jobUrl: jobUrl,
-            notes: notes
-        };
-
-        applications.push(newApplication);
-
-        saveApplications();
+    if (!aiInbox) {
+        return;
     }
 
-    // Refresh dashboard
-    saveApplications();
+
+    if (applications.length === 0) {
+
+        aiInbox.innerHTML = `
+            <p>No applications to analyse yet.</p>
+        `;
+
+        return;
+    }
+
+
+    const recommendations =
+        applications.map(application => {
+
+            let message = "";
+
+
+            switch (application.status) {
+
+                case "Applied":
+
+                    message =
+                        "Consider following up if you have not received a response.";
+
+                    break;
+
+
+                case "Assessment":
+
+                    message =
+                        "Assessment stage. Complete any required tests and prepare for the next step.";
+
+                    break;
+
+
+                case "Interview":
+
+                    message =
+                        "Interview stage. Prepare questions, research the company, and review the role.";
+
+                    break;
+
+
+                case "Offer":
+
+                    message =
+                        "Offer received. Review the salary, benefits, conditions, and next steps.";
+
+                    break;
+
+
+                case "Rejected":
+
+                    message =
+                        "Application closed. Consider similar opportunities and continue applying.";
+
+                    break;
+
+
+                default:
+
+                    message =
+                        "Review this application and update its status when needed.";
+
+            }
+
+
+            return `
+
+                <div class="ai-recommendation">
+
+                    <strong>
+                        ${application.company}
+                    </strong>
+
+                    <span>
+                        ${application.status}
+                    </span>
+
+                    <p>
+                        ${message}
+                    </p>
+
+                </div>
+
+            `;
+
+        });
+
+
+    aiInbox.innerHTML =
+        recommendations.join("");
+}
+
+
+/* =========================================================
+   INITIAL PAGE LOAD
+   ========================================================= */
+
+if (document.querySelector(".kanban-column")) {
     updateStatistics();
     renderApplications();
     updateColumnCounts();
+}
 
-    // Reset form
-    applicationForm.reset();
+renderApplicationsPage();
+updateAIInbox();
 
-    editingApplicationId = null;
+/* =========================================================
+   APPLICATION MODAL
+   ========================================================= */
 
-    // Restore Add mode
+const modal =
     document.querySelector(
-        ".modal-header h2"
-    ).textContent = "Add Job Application";
+        "#application-modal"
+    );
 
+const openModalButton =
     document.querySelector(
-        "#submit-application"
-    ).textContent = "Add Application";
+        "#open-modal"
+    );
 
-    modal.classList.remove("active");
-});
+const closeModalButton =
+    document.querySelector(
+        "#close-modal"
+    );
 
-// Delete application
-document.addEventListener("click", event => {
-    if (event.target.classList.contains("delete-btn")) {
-        const applicationId =
-            Number(event.target.dataset.id);
+const cancelModalButton =
+    document.querySelector(
+        "#cancel-modal"
+    );
 
-        const confirmDelete = confirm(
-            "Are you sure you want to delete this application?"
-        );
+const applicationForm =
+    document.querySelector(
+        "#application-form"
+    );
 
-        if (!confirmDelete) {
-            return;
+const hasApplicationModal =
+    modal &&
+    openModalButton &&
+    closeModalButton &&
+    cancelModalButton &&
+    applicationForm;
+
+
+/* =========================================================
+   OPEN MODAL
+   ========================================================= */
+
+if (hasApplicationModal) {
+    openModalButton.addEventListener(
+        "click",
+        () => {
+            applicationForm.reset();
+            editingApplicationId = null;
+
+            document.querySelector(
+                ".modal-header h2"
+            ).textContent =
+                "Add Job Application";
+
+            document.querySelector(
+                "#submit-application"
+            ).textContent =
+                "Add Application";
+
+            modal.classList.add(
+                "active"
+            );
+        }
+    );
+}
+
+/* =========================================================
+   CLOSE MODAL
+   ========================================================= */
+
+if (hasApplicationModal) {
+    closeModalButton.addEventListener(
+        "click",
+        () => {
+            modal.classList.remove("active");
+        }
+    );
+}
+
+
+/* =========================================================
+   CANCEL FORM
+   ========================================================= */
+
+if (hasApplicationModal) {
+    cancelModalButton.addEventListener(
+        "click",
+        () => {
+            modal.classList.remove("active");
+        }
+    );
+}
+
+
+/* =========================================================
+   CLOSE MODAL OUTSIDE
+   ========================================================= */
+
+if (hasApplicationModal) {
+    modal.addEventListener(
+        "click",
+        event => {
+            if (event.target === modal) {
+                modal.classList.remove("active");
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   APPLICATION FORM
+   ========================================================= */
+
+if (hasApplicationModal) {
+
+    applicationForm.addEventListener(
+        "submit",
+    event => {
+
+        event.preventDefault();
+
+
+        /* Get form values */
+
+        const company =
+            document.querySelector(
+                "#company"
+            ).value.trim();
+
+
+        const role =
+            document.querySelector(
+                "#role"
+            ).value.trim();
+
+
+        const location =
+            document.querySelector(
+                "#location"
+            ).value.trim();
+
+
+        const status =
+            document.querySelector(
+                "#status"
+            ).value;
+
+
+        const applicationDate =
+            document.querySelector(
+                "#application-date"
+            ).value;
+
+
+        const salary =
+            document.querySelector(
+                "#salary"
+            ).value.trim();
+
+
+        const closingDate =
+            document.querySelector(
+                "#closing-date"
+            ).value;
+
+
+        const jobUrl =
+            document.querySelector(
+                "#job-url"
+            ).value.trim();
+
+
+        const notes =
+            document.querySelector(
+                "#notes"
+            ).value.trim();
+
+
+        /* Edit existing application */
+
+        if (editingApplicationId !== null) {
+
+            const application =
+                applications.find(
+                    application =>
+                        application.id ===
+                        editingApplicationId
+                );
+
+
+            if (application) {
+
+                application.company =
+                    company;
+
+                application.role =
+                    role;
+
+                application.location =
+                    location;
+
+                application.status =
+                    status;
+
+                application.applicationDate =
+                    applicationDate;
+
+                application.salary =
+                    salary;
+
+                application.closingDate =
+                    closingDate;
+
+                application.jobUrl =
+                    jobUrl;
+
+                application.notes =
+                    notes;
+
+            }
+
+        } else {
+
+            /* Create new application */
+
+            const newApplication = {
+
+                id: Date.now(),
+
+                company: company,
+
+                role: role,
+
+                location: location,
+
+                status: status,
+
+                applicationDate:
+                    applicationDate,
+
+                salary: salary,
+
+                closingDate:
+                    closingDate,
+
+                jobUrl: jobUrl,
+
+                notes: notes
+
+            };
+
+
+            applications.push(
+                newApplication
+            );
+
         }
 
-        applications = applications.filter(
-            application =>
-                application.id !== applicationId
-        );
+
+        /* Save changes */
 
         saveApplications();
 
+
+        /* Refresh dashboard */
+
         updateStatistics();
+
         renderApplications();
+
         updateColumnCounts();
-    }
-});
 
-// Edit application
-document.addEventListener("click", event => {
-    if (event.target.classList.contains("edit-btn")) {
-        const applicationId =
-            Number(event.target.dataset.id);
+        updateAIInbox();
 
-        const application =
-            applications.find(
-                application =>
-                    application.id === applicationId
-            );
 
-        if (!application) {
-            return;
-        }
+        /* Reset form */
 
-        editingApplicationId = applicationId;
+        applicationForm.reset();
 
-        // Fill the form
-        document.querySelector("#company").value =
-            application.company;
+        editingApplicationId =
+            null;
 
-        document.querySelector("#role").value =
-            application.role;
 
-        document.querySelector("#location").value =
-            application.location || "";
+        /* Restore Add mode */
 
-        document.querySelector("#status").value =
-            application.status;
-
-        document.querySelector("#application-date").value =
-            application.applicationDate || "";
-
-        document.querySelector("#salary").value =
-            application.salary || "";
-
-        document.querySelector("#closing-date").value =
-            application.closingDate || "";
-
-        document.querySelector("#job-url").value =
-            application.jobUrl || "";
-
-        document.querySelector("#notes").value =
-            application.notes || "";
-            
-
-        // Update modal
         document.querySelector(
             ".modal-header h2"
-        ).textContent = "Edit Job Application";
+        ).textContent =
+            "Add Job Application";
+
 
         document.querySelector(
             "#submit-application"
-        ).textContent = "Save Changes";
+        ).textContent =
+            "Add Application";
 
-        modal.classList.add("active");
+
+              modal.classList.remove(
+            "active"
+        );
     }
-});
+    );
+
+}
+
+/* =========================================================
+   DELETE APPLICATION
+   ========================================================= */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.classList.contains(
+                "delete-btn"
+            )
+        ) {
+
+            const applicationId =
+                Number(
+                    event.target.dataset.id
+                );
+
+
+            const confirmDelete =
+                confirm(
+                    "Are you sure you want to delete this application?"
+                );
+
+
+            if (!confirmDelete) {
+                return;
+            }
+
+
+            applications =
+                applications.filter(
+                    application =>
+                        application.id !==
+                        applicationId
+                );
+
+
+            saveApplications();
+
+            updateStatistics();
+
+            renderApplications();
+
+            updateColumnCounts();
+
+            updateAIInbox();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   EDIT APPLICATION
+   ========================================================= */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.classList.contains(
+                "edit-btn"
+            )
+        ) {
+
+            const applicationId =
+                Number(
+                    event.target.dataset.id
+                );
+
+
+            const application =
+                applications.find(
+                    application =>
+                        application.id ===
+                        applicationId
+                );
+
+
+            if (!application) {
+                return;
+            }
+
+
+            editingApplicationId =
+                applicationId;
+
+
+            /* Fill the form */
+
+            document.querySelector(
+                "#company"
+            ).value =
+                application.company;
+
+
+            document.querySelector(
+                "#role"
+            ).value =
+                application.role;
+
+
+            document.querySelector(
+                "#location"
+            ).value =
+                application.location || "";
+
+
+            document.querySelector(
+                "#status"
+            ).value =
+                application.status;
+
+
+            document.querySelector(
+                "#application-date"
+            ).value =
+                application.applicationDate || "";
+
+
+            document.querySelector(
+                "#salary"
+            ).value =
+                application.salary || "";
+
+
+            document.querySelector(
+                "#closing-date"
+            ).value =
+                application.closingDate || "";
+
+
+            document.querySelector(
+                "#job-url"
+            ).value =
+                application.jobUrl || "";
+
+
+            document.querySelector(
+                "#notes"
+            ).value =
+                application.notes || "";
+
+
+            /* Update modal */
+
+            document.querySelector(
+                ".modal-header h2"
+            ).textContent =
+                "Edit Job Application";
+
+
+            document.querySelector(
+                "#submit-application"
+            ).textContent =
+                "Save Changes";
+
+
+            modal.classList.add(
+                "active"
+            );
+
+        }
+
+    }
+);
