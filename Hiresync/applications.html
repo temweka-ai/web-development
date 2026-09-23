@@ -41,10 +41,42 @@
                 </p>
             </div>
 
-            <button class="add-job-btn" id="addApplicationBtn">
+            <button class="add-job-btn" id="open-modal">
                 + Add Application
             </button>
         </section>
+
+        <div class="application-summary" id="application-summary">
+    <div class="summary-item">
+        <span class="summary-label">TOTAL</span>
+        <strong id="summary-total">0</strong>
+    </div>
+
+    <div class="summary-item">
+        <span class="summary-label">APPLIED</span>
+        <strong id="summary-applied">0</strong>
+    </div>
+
+    <div class="summary-item">
+        <span class="summary-label">ASSESSMENTS</span>
+        <strong id="summary-assessment">0</strong>
+    </div>
+
+    <div class="summary-item">
+        <span class="summary-label">INTERVIEWS</span>
+        <strong id="summary-interview">0</strong>
+    </div>
+
+    <div class="summary-item">
+        <span class="summary-label">OFFERS</span>
+        <strong id="summary-offer">0</strong>
+    </div>
+
+    <div class="summary-item">
+        <span class="summary-label">REJECTED</span>
+        <strong id="summary-rejected">0</strong>
+    </div>
+</div>
 
         <section class="panel">
             <div class="panel-header">
@@ -83,6 +115,19 @@
                     </select>
                 </div>
 
+                <div class="filter-box">
+    <label for="applicationSort">
+        Sort
+    </label>
+    <select id="applicationSort">
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="company">Company A–Z</option>
+        <option value="closing">Closing Date</option>
+        <option value="status">Status</option>
+    </select>
+</div>
+
             </div>
 
             <div id="applicationsList">
@@ -92,6 +137,85 @@
         </section>
 
     </main>
+
+    <!-- Add/Edit Application Modal -->
+<div class="modal-overlay" id="application-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div>
+                <p class="eyebrow">NEW APPLICATION</p>
+                <h2>Add Job Application</h2>
+            </div>
+            <button class="close-modal" id="close-modal" type="button">
+                ×
+            </button>
+        </div>
+
+        <form id="application-form">
+            <div class="form-group">
+                <label for="company">Company</label>
+                <input type="text" id="company" placeholder="e.g. Microsoft" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Job Title</label>
+                <input type="text" id="role" placeholder="e.g. Junior Front-End Developer" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="e.g. Johannesburg">
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status">
+                        <option value="Applied">Applied</option>
+                        <option value="Assessment">Assessment</option>
+                        <option value="Interview">Interview</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="application-date">Application Date</label>
+                <input type="date" id="application-date">
+            </div>
+
+            <div class="form-group">
+                <label for="salary">Salary</label>
+                <input type="text" id="salary" placeholder="e.g. R15,000 per month">
+            </div>
+
+            <div class="form-group">
+                <label for="closing-date">Closing Date</label>
+                <input type="date" id="closing-date">
+            </div>
+
+            <div class="form-group">
+                <label for="job-url">Job URL</label>
+                <input type="url" id="job-url" placeholder="https://...">
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" rows="4" placeholder="Add any notes about this application..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancel-modal">
+                    Cancel
+                </button>
+                <button type="submit" class="submit-btn" id="submit-application">
+                    Add Application
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
     <footer>
         <p>HireSync © 2026 Temweka Marivate</p>

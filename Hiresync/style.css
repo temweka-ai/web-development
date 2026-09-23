@@ -1540,3 +1540,140 @@ footer:hover p {
     }
 
 }
+
+/* =========================================================
+   28. APPLICATIONS PAGE
+   ========================================================= */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 30px;
+    margin-bottom: 35px;
+}
+
+.page-header h1 {
+    font-size: clamp(30px, 4vw, 46px);
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+}
+
+.page-header .subtitle {
+    color: var(--text-muted);
+    margin-top: 10px;
+    font-size: 15px;
+}
+
+.panel-description {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+#applicationsList {
+    padding: 18px;
+}
+
+#applicationsList .application-card {
+    cursor: default;
+}
+
+@media (max-width: 700px) {
+    .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    #applicationsList {
+        padding: 12px;
+    }
+}
+
+/* =========================================================
+   29. APPLICATION SUMMARY
+   ========================================================= */
+
+.application-summary {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.summary-item:hover {
+    transform: translateY(-2px);
+    border-color: #354052;
+    background: var(--surface-light);
+}
+
+.summary-label {
+    display: block;
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    margin-bottom: 8px;
+}
+
+.summary-item strong {
+    display: block;
+    font-size: 24px;
+    line-height: 1;
+}
+
+@media (max-width: 900px) {
+    .application-summary {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .application-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =========================================================
+   30. APPLICATION CARD GRID
+   ========================================================= */
+
+#applicationsList {
+    padding: 18px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+#applicationsList .application-card {
+    margin-bottom: 0;
+    height: 100%;
+}
+
+#applicationsList .application-actions {
+    margin-top: auto;
+}
+
+#applicationsList .application-card {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 700px) {
+    #applicationsList {
+        grid-template-columns: 1fr;
+        padding: 12px;
+    }
+}
