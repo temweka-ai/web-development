@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="HireSync interview management and interview schedule."
+    >
+
+    <meta
+        name="author"
+        content="Temweka Marivate"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0B0D12"
+    >
+
+    <title>
+        HireSync | Interviews
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================================
+         NAVIGATION
+         ========================================================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Hire<span>Sync</span>
+        </div>
+
+
+        <div class="nav-links">
+
+            <a href="index.html">
+                Dashboard
+            </a>
+
+            <a href="applications.html">
+                Applications
+            </a>
+
+            <a
+                href="interviews.html"
+                class="active"
+            >
+                Interviews
+            </a>
+
+            <a href="analytics.html">
+                Analytics
+            </a>
+
+        </div>
+
+
+        <div class="nav-user">
+            TM
+        </div>
+
+    </nav>
+
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
+    <main>
+
+
+        <!-- Page Header -->
+
+        <section class="page-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    INTERVIEW MANAGEMENT
+                </p>
+
+                <h1>
+                    Interviews
+                </h1>
+
+                <p class="subtitle">
+                    Keep track of every interview,
+                    date, time and location.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             INTERVIEW SUMMARY
+             ===================================================== -->
+
+        <section class="application-summary interview-summary">
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    TOTAL INTERVIEWS
+                </span>
+
+                <strong id="interview-total">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    UPCOMING
+                </span>
+
+                <strong id="interview-upcoming">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    TODAY
+                </span>
+
+                <strong id="interview-today">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    COMPLETED
+                </span>
+
+                <strong id="interview-completed">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             INTERVIEW LIST
+             ===================================================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        SCHEDULE
+                    </p>
+
+                    <h2>
+                        Scheduled Interviews
+                    </h2>
+
+                    <p class="panel-description">
+                        Your interview schedule pulled
+                        from your HireSync applications.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div id="upcoming-interviews">
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        +
+                    </div>
+
+                    <h3>
+                        No interviews scheduled
+                    </h3>
+
+                    <p>
+                        Add an interview date and time
+                        to an application to see it here.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+
+    <footer>
+
+        <p>
+            HireSync © 2026 Temweka Marivate
+        </p>
+
+        <p>
+            Career Command Center
+        </p>
+
+    </footer>
+
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+         ========================================================= -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

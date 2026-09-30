@@ -29,8 +29,8 @@
         <div class="nav-links">
             <a href="index.html" class="active">Dashboard</a>
             <a href="applications.html">Applications</a>
-            <a href="#">Interviews</a>
-            <a href="#">Analytics</a>
+            <a href="interviews.html">Interviews</a>
+            <a href="analytics.html">Analytics</a>
         </div>
 
         <div class="nav-user">
@@ -48,7 +48,7 @@
             <div>
                 <p class="eyebrow">CAREER COMMAND CENTER</p>
 
-                <h1>Good evening, Temweka.</h1>
+                <h1 id="greeting">Good evening, Temweka.</h1>
 
                 <p class="subtitle">
                     Here's what's happening with your job search.
@@ -269,53 +269,45 @@
             </div>
 
 
-            <!-- Upcoming Interviews -->
-            <div class="panel interviews-panel">
+          <!-- Upcoming Interviews -->
+<div class="panel interviews-panel">
 
-                <div class="panel-header">
+    <div class="panel-header">
 
-                    <div>
-                        <p class="eyebrow">SCHEDULE</p>
-                        <h2>Upcoming Interviews</h2>
-                    </div>
+        <div>
+            <p class="eyebrow">
+                SCHEDULE
+            </p>
 
-                </div>
+            <h2>
+                Upcoming Interviews
+            </h2>
+        </div>
 
+    </div>
 
-                <div class="empty-state">
+    <div id="upcoming-interviews">
 
-                    <div class="empty-icon">
-                        +
-                    </div>
+        <div class="empty-state">
 
-                    <h3>No interviews yet</h3>
-
-                    <p>
-                        Interviews you add to HireSync will appear here.
-                    </p>
-
-                </div>
-
+            <div class="empty-icon">
+                +
             </div>
 
-        </section>
+            <h3>
+                No interviews yet
+            </h3>
 
+            <p>
+                Interviews you add to HireSync
+                will appear here.
+            </p>
 
-        <!-- AI Inbox -->
-        <section class="panel ai-inbox">
+        </div>
 
-            <div class="panel-header">
+    </div>
 
-                <div>
-                    <p class="eyebrow">AI INTELLIGENCE</p>
-                    <h2>Recruitment Inbox</h2>
-                </div>
-
-                <span class="ai-status">
-                    ● AI STANDBY
-                </span>
-
-            </div>
+</div>
 
 
             <div class="ai-empty">
@@ -373,184 +365,216 @@
             <!-- Application Form -->
             <form id="application-form">
 
-                <div class="form-group">
+    <div class="form-group">
 
-                    <label for="company">
-                        Company
-                    </label>
+        <label for="company">
+            Company
+        </label>
 
-                    <input
-                        type="text"
-                        id="company"
-                        placeholder="e.g. Microsoft"
-                        required
-                    >
+        <input
+            type="text"
+            id="company"
+            placeholder="e.g. Microsoft"
+            required
+        >
 
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="role">
-                        Job Title
-                    </label>
-
-                    <input
-                        type="text"
-                        id="role"
-                        placeholder="e.g. Junior Front-End Developer"
-                        required
-                    >
-
-                </div>
+    </div>
 
 
-                <div class="form-row">
+    <div class="form-group">
 
-                    <div class="form-group">
+        <label for="role">
+            Job Title
+        </label>
 
-                        <label for="location">
-                            Location
-                        </label>
+        <input
+            type="text"
+            id="role"
+            placeholder="e.g. Junior Front-End Developer"
+            required
+        >
 
-                        <input
-                            type="text"
-                            id="location"
-                            placeholder="e.g. Johannesburg"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="status">
-                            Status
-                        </label>
-
-                        <select id="status">
-
-                            <option value="Applied">
-                                Applied
-                            </option>
-
-                            <option value="Assessment">
-                                Assessment
-                            </option>
-
-                            <option value="Interview">
-                                Interview
-                            </option>
-
-                            <option value="Offer">
-                                Offer
-                            </option>
-
-                            <option value="Rejected">
-                                Rejected
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
+    </div>
 
 
-                <div class="form-group">
+    <div class="form-row">
 
-                    <label for="application-date">
-                        Application Date
-                    </label>
+        <div class="form-group">
 
-                    <input
-                        type="date"
-                        id="application-date"
-                    >
+            <label for="location">
+                Location
+            </label>
 
-                </div>
+            <input
+                type="text"
+                id="location"
+                placeholder="e.g. Johannesburg"
+            >
 
-
-                <div class="form-group">
-
-                    <label for="salary">
-                        Salary
-                    </label>
-
-                    <input
-                        type="text"
-                        id="salary"
-                        placeholder="e.g. R15,000 per month"
-                    >
-
-                </div>
+        </div>
 
 
-                <div class="form-group">
+        <div class="form-group">
 
-                    <label for="closing-date">
-                        Closing Date
-                    </label>
+            <label for="status">
+                Status
+            </label>
 
-                    <input
-                        type="date"
-                        id="closing-date"
-                    >
+            <select id="status">
 
-                </div>
+                <option value="Applied">
+                    Applied
+                </option>
 
+                <option value="Assessment">
+                    Assessment
+                </option>
 
-                <div class="form-group">
+                <option value="Interview">
+                    Interview
+                </option>
 
-                    <label for="job-url">
-                        Job URL
-                    </label>
+                <option value="Offer">
+                    Offer
+                </option>
 
-                    <input
-                        type="url"
-                        id="job-url"
-                        placeholder="https://..."
-                    >
+                <option value="Rejected">
+                    Rejected
+                </option>
 
-                </div>
+            </select>
 
+        </div>
 
-                <div class="form-group">
-
-                    <label for="notes">
-                        Notes
-                    </label>
-
-                    <textarea
-                        id="notes"
-                        rows="4"
-                        placeholder="Add any notes about this application..."
-                    ></textarea>
-
-                </div>
+    </div>
 
 
-                <div class="form-actions">
+    <div class="form-group">
 
-                    <button
-                        type="button"
-                        class="cancel-btn"
-                        id="cancel-modal"
-                    >
-                        Cancel
-                    </button>
+        <label for="application-date">
+            Application Date
+        </label>
 
-                    <button
-                        type="submit"
-                        class="submit-btn"
-                        id="submit-application"
-                    >
-                        Add Application
-                    </button>
+        <input
+            type="date"
+            id="application-date"
+        >
 
-                </div>
+    </div>
 
-            </form>
+
+    <div class="form-row">
+
+        <div class="form-group">
+
+            <label for="interview-date">
+                Interview Date
+            </label>
+
+            <input
+                type="date"
+                id="interview-date"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="interview-time">
+                Interview Time
+            </label>
+
+            <input
+                type="time"
+                id="interview-time"
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="salary">
+            Salary
+        </label>
+
+        <input
+            type="text"
+            id="salary"
+            placeholder="e.g. R15,000 per month"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="closing-date">
+            Closing Date
+        </label>
+
+        <input
+            type="date"
+            id="closing-date"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="job-url">
+            Job URL
+        </label>
+
+        <input
+            type="url"
+            id="job-url"
+            placeholder="https://..."
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="notes">
+            Notes
+        </label>
+
+        <textarea
+            id="notes"
+            rows="4"
+            placeholder="Add any notes about this application..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            type="button"
+            class="cancel-btn"
+            id="cancel-modal"
+        >
+            Cancel
+        </button>
+
+        <button
+            type="submit"
+            class="submit-btn"
+            id="submit-application"
+        >
+            Add Application
+        </button>
+
+    </div>
+
+</form>
 
         </div>
 
