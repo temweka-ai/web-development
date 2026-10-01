@@ -1,136 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Applications | HireSync</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="style.css">
+    <title>Applications | JobTsela</title>
 
-    <script src="script.js" defer></script>
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <script
+        src="script.js"
+        defer
+    ></script>
+
 </head>
 
 <body>
 
     <nav class="navbar">
+
         <div class="logo">
-            Hire<span>Sync</span>
+            Job<span>Tsela</span>
         </div>
 
         <div class="nav-links">
-            <a href="index.html">Dashboard</a>
-            <a href="applications.html" class="active">Applications</a>
-            <a href="interviews.html">Interviews</a>
-            <a href="analytics.html">Analytics</a>
+
+            <a href="index.html">
+                Dashboard
+            </a>
+
+            <a
+                href="applications.html"
+                class="active"
+            >
+                Applications
+            </a>
+
+            <a href="interviews.html">
+                Interviews
+            </a>
+
+            <a href="analytics.html">
+                Analytics
+            </a>
+
         </div>
 
         <div class="nav-user">
             TM
         </div>
+
     </nav>
-    
+
+
     <main>
 
         <section class="page-header">
-            <div>
-                <p class="eyebrow">APPLICATION MANAGEMENT</p>
 
-                <h1>Applications</h1>
+            <div>
+
+                <p class="eyebrow">
+                    APPLICATION MANAGEMENT
+                </p>
+
+                <h1>
+                    Applications
+                </h1>
 
                 <p class="subtitle">
                     Track, organize, and manage your job applications.
                 </p>
+
             </div>
 
-            <button class="add-job-btn" id="open-modal">
+            <button
+                class="add-job-btn"
+                id="open-modal"
+                type="button"
+            >
                 + Add Application
             </button>
+
         </section>
 
-        <div class="application-summary" id="application-summary">
-    <div class="summary-item">
-        <span class="summary-label">TOTAL</span>
-        <strong id="summary-total">0</strong>
-    </div>
 
-    <div class="summary-item">
-        <span class="summary-label">APPLIED</span>
-        <strong id="summary-applied">0</strong>
-    </div>
+        <div
+            class="application-summary"
+            id="application-summary"
+        >
 
-    <div class="summary-item">
-        <span class="summary-label">ASSESSMENTS</span>
-        <strong id="summary-assessment">0</strong>
-    </div>
+            <div class="summary-item">
 
-    <div class="summary-item">
-        <span class="summary-label">INTERVIEWS</span>
-        <strong id="summary-interview">0</strong>
-    </div>
+                <span class="summary-label">
+                    TOTAL
+                </span>
 
-    <div class="summary-item">
-        <span class="summary-label">OFFERS</span>
-        <strong id="summary-offer">0</strong>
-    </div>
+                <strong id="summary-total">
+                    0
+                </strong>
 
-    <div class="summary-item">
-        <span class="summary-label">REJECTED</span>
-        <strong id="summary-rejected">0</strong>
-    </div>
-</div>
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    APPLIED
+                </span>
+
+                <strong id="summary-applied">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    ASSESSMENTS
+                </span>
+
+                <strong id="summary-assessment">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    INTERVIEWS
+                </span>
+
+                <strong id="summary-interview">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    OFFERS
+                </span>
+
+                <strong id="summary-offer">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    REJECTED
+                </span>
+
+                <strong id="summary-rejected">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
 
         <section class="panel">
+
             <div class="panel-header">
+
                 <div>
-                    <h2>All Applications</h2>
+
+                    <h2>
+                        All Applications
+                    </h2>
+
                     <p class="panel-description">
                         Your complete job application history.
                     </p>
+
                 </div>
+
             </div>
+
 
             <div class="application-controls">
 
                 <div class="search-box">
-                    <span class="search-icon">⌕</span>
+
+                    <span class="search-icon">
+                        ⌕
+                    </span>
 
                     <input
                         type="text"
                         id="applicationSearch"
                         placeholder="Search applications..."
                     >
+
                 </div>
 
+
                 <div class="filter-box">
+
                     <label for="applicationFilter">
                         Status
                     </label>
 
                     <select id="applicationFilter">
-                        <option value="all">All</option>
-                        <option value="Applied">Applied</option>
-                        <option value="Assessment">Assessment</option>
-                        <option value="Interview">Interview</option>
-                        <option value="Offer">Offer</option>
-                        <option value="Rejected">Rejected</option>
+
+                        <option value="all">
+                            All
+                        </option>
+
+                        <option value="Applied">
+                            Applied
+                        </option>
+
+                        <option value="Assessment">
+                            Assessment
+                        </option>
+
+                        <option value="Interview">
+                            Interview
+                        </option>
+
+                        <option value="Offer">
+                            Offer
+                        </option>
+
+                        <option value="Rejected">
+                            Rejected
+                        </option>
+
                     </select>
+
                 </div>
 
+
                 <div class="filter-box">
-    <label for="applicationSort">
-        Sort
-    </label>
-    <select id="applicationSort">
-        <option value="newest">Newest</option>
-        <option value="oldest">Oldest</option>
-        <option value="company">Company A–Z</option>
-        <option value="closing">Closing Date</option>
-        <option value="status">Status</option>
-    </select>
-</div>
+
+                    <label for="applicationSort">
+                        Sort
+                    </label>
+
+                    <select id="applicationSort">
+
+                        <option value="newest">
+                            Newest
+                        </option>
+
+                        <option value="oldest">
+                            Oldest
+                        </option>
+
+                        <option value="company">
+                            Company A–Z
+                        </option>
+
+                        <option value="closing">
+                            Closing Date
+                        </option>
+
+                        <option value="status">
+                            Status
+                        </option>
+
+                    </select>
+
+                </div>
 
             </div>
+
 
             <div id="applicationsList">
                 <!-- Applications will appear here -->
@@ -140,89 +294,238 @@
 
     </main>
 
+
     <!-- Add/Edit Application Modal -->
-<div class="modal-overlay" id="application-modal">
-    <div class="modal">
-        <div class="modal-header">
-            <div>
-                <p class="eyebrow">NEW APPLICATION</p>
-                <h2>Add Job Application</h2>
+    <div
+        class="modal-overlay"
+        id="application-modal"
+    >
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        NEW APPLICATION
+                    </p>
+
+                    <h2>
+                        Add Job Application
+                    </h2>
+
+                </div>
+
+                <button
+                    class="close-modal"
+                    id="close-modal"
+                    type="button"
+                >
+                    ×
+                </button>
+
             </div>
-            <button class="close-modal" id="close-modal" type="button">
-                ×
-            </button>
+
+
+            <form id="application-form">
+
+                <div class="form-group">
+
+                    <label for="company">
+                        Company
+                    </label>
+
+                    <input
+                        type="text"
+                        id="company"
+                        placeholder="e.g. Microsoft"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="role">
+                        Job Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="role"
+                        placeholder="e.g. Junior Front-End Developer"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="location">
+                            Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="location"
+                            placeholder="e.g. Johannesburg"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="status">
+                            Status
+                        </label>
+
+                        <select id="status">
+
+                            <option value="Applied">
+                                Applied
+                            </option>
+
+                            <option value="Assessment">
+                                Assessment
+                            </option>
+
+                            <option value="Interview">
+                                Interview
+                            </option>
+
+                            <option value="Offer">
+                                Offer
+                            </option>
+
+                            <option value="Rejected">
+                                Rejected
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="application-date">
+                        Application Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="application-date"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="salary">
+                        Salary
+                    </label>
+
+                    <input
+                        type="text"
+                        id="salary"
+                        placeholder="e.g. R15,000 per month"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="closing-date">
+                        Closing Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="closing-date"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="job-url">
+                        Job URL
+                    </label>
+
+                    <input
+                        type="url"
+                        id="job-url"
+                        placeholder="https://..."
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="notes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="notes"
+                        rows="4"
+                        placeholder="Add any notes about this application..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        id="cancel-modal"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="submit-btn"
+                        id="submit-application"
+                    >
+                        Add Application
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
 
-        <form id="application-form">
-            <div class="form-group">
-                <label for="company">Company</label>
-                <input type="text" id="company" placeholder="e.g. Microsoft" required>
-            </div>
-
-            <div class="form-group">
-                <label for="role">Job Title</label>
-                <input type="text" id="role" placeholder="e.g. Junior Front-End Developer" required>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="location">Location</label>
-                    <input type="text" id="location" placeholder="e.g. Johannesburg">
-                </div>
-
-                <div class="form-group">
-                    <label for="status">Status</label>
-                    <select id="status">
-                        <option value="Applied">Applied</option>
-                        <option value="Assessment">Assessment</option>
-                        <option value="Interview">Interview</option>
-                        <option value="Offer">Offer</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="application-date">Application Date</label>
-                <input type="date" id="application-date">
-            </div>
-
-            <div class="form-group">
-                <label for="salary">Salary</label>
-                <input type="text" id="salary" placeholder="e.g. R15,000 per month">
-            </div>
-
-            <div class="form-group">
-                <label for="closing-date">Closing Date</label>
-                <input type="date" id="closing-date">
-            </div>
-
-            <div class="form-group">
-                <label for="job-url">Job URL</label>
-                <input type="url" id="job-url" placeholder="https://...">
-            </div>
-
-            <div class="form-group">
-                <label for="notes">Notes</label>
-                <textarea id="notes" rows="4" placeholder="Add any notes about this application..."></textarea>
-            </div>
-
-            <div class="form-actions">
-                <button type="button" class="cancel-btn" id="cancel-modal">
-                    Cancel
-                </button>
-                <button type="submit" class="submit-btn" id="submit-application">
-                    Add Application
-                </button>
-            </div>
-        </form>
     </div>
-</div>
+
 
     <footer>
-        <p>HireSync © 2026 Temweka Marivate</p>
-        <p>Career Command Center</p>
+
+        <p>
+            JobTsela © 2026 Temweka Marivate
+        </p>
+
+        <p>
+            Career Command Center
+        </p>
+
     </footer>
 
 </body>
+
 </html>

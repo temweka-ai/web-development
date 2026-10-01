@@ -1,20 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <meta
         name="description"
-        content="HireSync is a professional AI-powered job application tracker and career command center."
+        content="JobTsela is a career command center for tracking local and international job opportunities."
     >
 
-    <meta name="author" content="Temweka Marivate">
-    <meta name="theme-color" content="#0B0D12">
+    <meta
+        name="author"
+        content="Temweka Marivate"
+    >
 
-    <title>HireSync | Job Application Command Center</title>
+    <meta
+        name="theme-color"
+        content="#0B0D12"
+    >
 
-    <link rel="stylesheet" href="style.css">
+    <title>JobTsela | Career Command Center</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
 
 <body>
@@ -23,14 +38,30 @@
     <nav class="navbar">
 
         <div class="logo">
-            Hire<span>Sync</span>
+            Job<span>Tsela</span>
         </div>
 
         <div class="nav-links">
-            <a href="index.html" class="active">Dashboard</a>
-            <a href="applications.html">Applications</a>
-            <a href="interviews.html">Interviews</a>
-            <a href="analytics.html">Analytics</a>
+
+            <a
+                href="index.html"
+                class="active"
+            >
+                Dashboard
+            </a>
+
+            <a href="applications.html">
+                Applications
+            </a>
+
+            <a href="interviews.html">
+                Interviews
+            </a>
+
+            <a href="analytics.html">
+                Analytics
+            </a>
+
         </div>
 
         <div class="nav-user">
@@ -46,16 +77,26 @@
         <section class="dashboard-header">
 
             <div>
-                <p class="eyebrow">CAREER COMMAND CENTER</p>
 
-                <h1 id="greeting">Good evening, Temweka.</h1>
+                <p class="eyebrow">
+                    CAREER COMMAND CENTER
+                </p>
+
+                <h1 id="greeting">
+                    Good evening, Temweka.
+                </h1>
 
                 <p class="subtitle">
                     Here's what's happening with your job search.
                 </p>
+
             </div>
 
-            <button class="add-job-btn" id="open-modal">
+            <button
+                class="add-job-btn"
+                id="open-modal"
+                type="button"
+            >
                 + Add Application
             </button>
 
@@ -66,57 +107,87 @@
         <section class="stats-grid">
 
             <div class="stat-card">
-                <p class="stat-label">TOTAL APPLICATIONS</p>
 
-                <h2 id="total-applications">0</h2>
+                <p class="stat-label">
+                    TOTAL APPLICATIONS
+                </p>
+
+                <h2 id="total-applications">
+                    0
+                </h2>
 
                 <p class="stat-description">
                     All tracked applications
                 </p>
+
             </div>
 
 
             <div class="stat-card">
-                <p class="stat-label">ASSESSMENTS</p>
 
-                <h2 id="total-assessments">0</h2>
+                <p class="stat-label">
+                    ASSESSMENTS
+                </p>
+
+                <h2 id="total-assessments">
+                    0
+                </h2>
 
                 <p class="stat-description">
                     Assessments in progress
                 </p>
+
             </div>
 
 
             <div class="stat-card">
-                <p class="stat-label">INTERVIEWS</p>
 
-                <h2 id="total-interviews">0</h2>
+                <p class="stat-label">
+                    INTERVIEWS
+                </p>
+
+                <h2 id="total-interviews">
+                    0
+                </h2>
 
                 <p class="stat-description">
                     Interviews secured
                 </p>
+
             </div>
 
 
             <div class="stat-card">
-                <p class="stat-label">OFFERS</p>
 
-                <h2 id="total-offers">0</h2>
+                <p class="stat-label">
+                    OFFERS
+                </p>
+
+                <h2 id="total-offers">
+                    0
+                </h2>
 
                 <p class="stat-description">
                     Offers received
                 </p>
+
             </div>
 
 
             <div class="stat-card">
-                <p class="stat-label">RESPONSE RATE</p>
 
-                <h2 id="response-rate">0%</h2>
+                <p class="stat-label">
+                    RESPONSE RATE
+                </p>
+
+                <h2 id="response-rate">
+                    0%
+                </h2>
 
                 <p class="stat-description">
                     Employer responses
                 </p>
+
             </div>
 
         </section>
@@ -131,11 +202,21 @@
                 <div class="panel-header">
 
                     <div>
-                        <p class="eyebrow">APPLICATION PIPELINE</p>
-                        <h2>My Applications</h2>
+
+                        <p class="eyebrow">
+                            APPLICATION PIPELINE
+                        </p>
+
+                        <h2>
+                            My Applications
+                        </h2>
+
                     </div>
 
-                    <button class="view-all" type="button">
+                    <button
+                        class="view-all"
+                        type="button"
+                    >
                         View All
                     </button>
 
@@ -147,7 +228,9 @@
 
                     <div class="search-box">
 
-                        <span class="search-icon">⌕</span>
+                        <span class="search-icon">
+                            ⌕
+                        </span>
 
                         <input
                             type="text"
@@ -204,8 +287,15 @@
                     <div class="kanban-column">
 
                         <div class="column-header">
-                            <span>Applied</span>
-                            <span class="column-count">0</span>
+
+                            <span>
+                                Applied
+                            </span>
+
+                            <span class="column-count">
+                                0
+                            </span>
+
                         </div>
 
                         <div class="application-list"></div>
@@ -217,8 +307,15 @@
                     <div class="kanban-column">
 
                         <div class="column-header">
-                            <span>Assessment</span>
-                            <span class="column-count">0</span>
+
+                            <span>
+                                Assessment
+                            </span>
+
+                            <span class="column-count">
+                                0
+                            </span>
+
                         </div>
 
                         <div class="application-list"></div>
@@ -230,8 +327,15 @@
                     <div class="kanban-column">
 
                         <div class="column-header">
-                            <span>Interview</span>
-                            <span class="column-count">0</span>
+
+                            <span>
+                                Interview
+                            </span>
+
+                            <span class="column-count">
+                                0
+                            </span>
+
                         </div>
 
                         <div class="application-list"></div>
@@ -243,8 +347,15 @@
                     <div class="kanban-column">
 
                         <div class="column-header">
-                            <span>Offer</span>
-                            <span class="column-count">0</span>
+
+                            <span>
+                                Offer
+                            </span>
+
+                            <span class="column-count">
+                                0
+                            </span>
+
                         </div>
 
                         <div class="application-list"></div>
@@ -256,8 +367,15 @@
                     <div class="kanban-column">
 
                         <div class="column-header">
-                            <span>Rejected</span>
-                            <span class="column-count">0</span>
+
+                            <span>
+                                Rejected
+                            </span>
+
+                            <span class="column-count">
+                                0
+                            </span>
+
                         </div>
 
                         <div class="application-list"></div>
@@ -269,45 +387,74 @@
             </div>
 
 
-          <!-- Upcoming Interviews -->
-<div class="panel interviews-panel">
+            <!-- Upcoming Interviews -->
+            <div class="panel interviews-panel">
 
-    <div class="panel-header">
+                <div class="panel-header">
 
-        <div>
-            <p class="eyebrow">
-                SCHEDULE
-            </p>
+                    <div>
 
-            <h2>
-                Upcoming Interviews
-            </h2>
-        </div>
+                        <p class="eyebrow">
+                            SCHEDULE
+                        </p>
 
-    </div>
+                        <h2>
+                            Upcoming Interviews
+                        </h2>
 
-    <div id="upcoming-interviews">
+                    </div>
 
-        <div class="empty-state">
+                </div>
 
-            <div class="empty-icon">
-                +
+
+                <div id="upcoming-interviews">
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            +
+                        </div>
+
+                        <h3>
+                            No interviews yet
+                        </h3>
+
+                        <p>
+                            Interviews you add to JobTsela
+                            will appear here.
+                        </p>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <h3>
-                No interviews yet
-            </h3>
+        </section>
 
-            <p>
-                Interviews you add to HireSync
-                will appear here.
-            </p>
 
-        </div>
+        <!-- AI Inbox -->
+        <section class="ai-inbox">
 
-    </div>
+            <div class="panel-header">
 
-</div>
+                <div>
+
+                    <p class="eyebrow">
+                        RECRUITMENT INTELLIGENCE
+                    </p>
+
+                    <h2>
+                        AI Inbox
+                    </h2>
+
+                </div>
+
+                <span class="ai-status">
+                    ● STANDBY
+                </span>
+
+            </div>
 
 
             <div class="ai-empty">
@@ -317,7 +464,7 @@
                 </h3>
 
                 <p>
-                    HireSync will eventually analyse recruiter emails
+                    JobTsela will eventually analyse recruiter emails
                     and automatically identify interviews, assessments,
                     rejections and offers.
                 </p>
@@ -332,23 +479,37 @@
     <!-- Footer -->
     <footer>
 
-        <p>HireSync © 2026 Temweka Marivate</p>
+        <p>
+            JobTsela © 2026 Temweka Marivate
+        </p>
 
-        <p>Career Command Center</p>
+        <p>
+            Career Command Center
+        </p>
 
     </footer>
 
 
     <!-- Add/Edit Application Modal -->
-    <div class="modal-overlay" id="application-modal">
+    <div
+        class="modal-overlay"
+        id="application-modal"
+    >
 
         <div class="modal">
 
             <div class="modal-header">
 
                 <div>
-                    <p class="eyebrow">NEW APPLICATION</p>
-                    <h2>Add Job Application</h2>
+
+                    <p class="eyebrow">
+                        NEW APPLICATION
+                    </p>
+
+                    <h2>
+                        Add Job Application
+                    </h2>
+
                 </div>
 
                 <button
@@ -365,216 +526,216 @@
             <!-- Application Form -->
             <form id="application-form">
 
-    <div class="form-group">
+                <div class="form-group">
 
-        <label for="company">
-            Company
-        </label>
+                    <label for="company">
+                        Company
+                    </label>
 
-        <input
-            type="text"
-            id="company"
-            placeholder="e.g. Microsoft"
-            required
-        >
+                    <input
+                        type="text"
+                        id="company"
+                        placeholder="e.g. Microsoft"
+                        required
+                    >
 
-    </div>
+                </div>
 
 
-    <div class="form-group">
+                <div class="form-group">
 
-        <label for="role">
-            Job Title
-        </label>
+                    <label for="role">
+                        Job Title
+                    </label>
 
-        <input
-            type="text"
-            id="role"
-            placeholder="e.g. Junior Front-End Developer"
-            required
-        >
+                    <input
+                        type="text"
+                        id="role"
+                        placeholder="e.g. Junior Front-End Developer"
+                        required
+                    >
 
-    </div>
+                </div>
 
 
-    <div class="form-row">
+                <div class="form-row">
 
-        <div class="form-group">
+                    <div class="form-group">
 
-            <label for="location">
-                Location
-            </label>
+                        <label for="location">
+                            Location
+                        </label>
 
-            <input
-                type="text"
-                id="location"
-                placeholder="e.g. Johannesburg"
-            >
+                        <input
+                            type="text"
+                            id="location"
+                            placeholder="e.g. Johannesburg"
+                        >
 
-        </div>
+                    </div>
 
 
-        <div class="form-group">
+                    <div class="form-group">
 
-            <label for="status">
-                Status
-            </label>
+                        <label for="status">
+                            Status
+                        </label>
 
-            <select id="status">
+                        <select id="status">
 
-                <option value="Applied">
-                    Applied
-                </option>
+                            <option value="Applied">
+                                Applied
+                            </option>
 
-                <option value="Assessment">
-                    Assessment
-                </option>
+                            <option value="Assessment">
+                                Assessment
+                            </option>
 
-                <option value="Interview">
-                    Interview
-                </option>
+                            <option value="Interview">
+                                Interview
+                            </option>
 
-                <option value="Offer">
-                    Offer
-                </option>
+                            <option value="Offer">
+                                Offer
+                            </option>
 
-                <option value="Rejected">
-                    Rejected
-                </option>
+                            <option value="Rejected">
+                                Rejected
+                            </option>
 
-            </select>
+                        </select>
 
-        </div>
+                    </div>
 
-    </div>
+                </div>
 
 
-    <div class="form-group">
+                <div class="form-group">
 
-        <label for="application-date">
-            Application Date
-        </label>
+                    <label for="application-date">
+                        Application Date
+                    </label>
 
-        <input
-            type="date"
-            id="application-date"
-        >
+                    <input
+                        type="date"
+                        id="application-date"
+                    >
 
-    </div>
+                </div>
 
 
-    <div class="form-row">
+                <div class="form-row">
 
-        <div class="form-group">
+                    <div class="form-group">
 
-            <label for="interview-date">
-                Interview Date
-            </label>
+                        <label for="interview-date">
+                            Interview Date
+                        </label>
 
-            <input
-                type="date"
-                id="interview-date"
-            >
+                        <input
+                            type="date"
+                            id="interview-date"
+                        >
 
-        </div>
+                    </div>
 
 
-        <div class="form-group">
+                    <div class="form-group">
 
-            <label for="interview-time">
-                Interview Time
-            </label>
+                        <label for="interview-time">
+                            Interview Time
+                        </label>
 
-            <input
-                type="time"
-                id="interview-time"
-            >
+                        <input
+                            type="time"
+                            id="interview-time"
+                        >
 
-        </div>
+                    </div>
 
-    </div>
+                </div>
 
 
-    <div class="form-group">
+                <div class="form-group">
 
-        <label for="salary">
-            Salary
-        </label>
+                    <label for="salary">
+                        Salary
+                    </label>
 
-        <input
-            type="text"
-            id="salary"
-            placeholder="e.g. R15,000 per month"
-        >
+                    <input
+                        type="text"
+                        id="salary"
+                        placeholder="e.g. R15,000 per month"
+                    >
 
-    </div>
+                </div>
 
 
-    <div class="form-group">
+                <div class="form-group">
 
-        <label for="closing-date">
-            Closing Date
-        </label>
+                    <label for="closing-date">
+                        Closing Date
+                    </label>
 
-        <input
-            type="date"
-            id="closing-date"
-        >
+                    <input
+                        type="date"
+                        id="closing-date"
+                    >
 
-    </div>
+                </div>
 
 
-    <div class="form-group">
+                <div class="form-group">
 
-        <label for="job-url">
-            Job URL
-        </label>
+                    <label for="job-url">
+                        Job URL
+                    </label>
 
-        <input
-            type="url"
-            id="job-url"
-            placeholder="https://..."
-        >
+                    <input
+                        type="url"
+                        id="job-url"
+                        placeholder="https://..."
+                    >
 
-    </div>
+                </div>
 
 
-    <div class="form-group">
+                <div class="form-group">
 
-        <label for="notes">
-            Notes
-        </label>
+                    <label for="notes">
+                        Notes
+                    </label>
 
-        <textarea
-            id="notes"
-            rows="4"
-            placeholder="Add any notes about this application..."
-        ></textarea>
+                    <textarea
+                        id="notes"
+                        rows="4"
+                        placeholder="Add any notes about this application..."
+                    ></textarea>
 
-    </div>
+                </div>
 
 
-    <div class="form-actions">
+                <div class="form-actions">
 
-        <button
-            type="button"
-            class="cancel-btn"
-            id="cancel-modal"
-        >
-            Cancel
-        </button>
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        id="cancel-modal"
+                    >
+                        Cancel
+                    </button>
 
-        <button
-            type="submit"
-            class="submit-btn"
-            id="submit-application"
-        >
-            Add Application
-        </button>
+                    <button
+                        type="submit"
+                        class="submit-btn"
+                        id="submit-application"
+                    >
+                        Add Application
+                    </button>
 
-    </div>
+                </div>
 
-</form>
+            </form>
 
         </div>
 
@@ -584,4 +745,5 @@
     <script src="script.js"></script>
 
 </body>
+
 </html>

@@ -1,6 +1,7 @@
 /* =========================================================
-   HIRESYNC JAVASCRIPT
+   JOBTSELA JAVASCRIPT
    ========================================================= */
+
 
 /* =========================================================
    DEMO APPLICATIONS
@@ -15,6 +16,7 @@ const defaultApplications = [
         status: "Applied",
         applicationDate: ""
     },
+
     {
         id: 2,
         company: "Takealot",
@@ -23,6 +25,7 @@ const defaultApplications = [
         status: "Interview",
         applicationDate: ""
     },
+
     {
         id: 3,
         company: "TymeBank",
@@ -33,16 +36,32 @@ const defaultApplications = [
     }
 ];
 
+
 /* =========================================================
    LOAD SAVED APPLICATIONS
    ========================================================= */
 
 const savedApplications =
+    localStorage.getItem("jobtselaApplications");
+
+const legacyApplications =
     localStorage.getItem("hiresyncApplications");
 
-let applications = savedApplications
-    ? JSON.parse(savedApplications)
-    : defaultApplications;
+let applications;
+
+if (savedApplications) {
+    applications = JSON.parse(savedApplications);
+} else if (legacyApplications) {
+    applications = JSON.parse(legacyApplications);
+
+    localStorage.setItem(
+        "jobtselaApplications",
+        JSON.stringify(applications)
+    );
+} else {
+    applications = defaultApplications;
+}
+
 
 /* =========================================================
    EDITING STATE
@@ -50,12 +69,14 @@ let applications = savedApplications
 
 let editingApplicationId = null;
 
+
 /* =========================================================
    DYNAMIC GREETING
    ========================================================= */
 
 function updateGreeting() {
-    const greetingElement = document.getElementById("greeting");
+    const greetingElement =
+        document.getElementById("greeting");
 
     if (!greetingElement) {
         return;
@@ -73,8 +94,10 @@ function updateGreeting() {
         greeting = "Good evening";
     }
 
-    greetingElement.textContent = `${greeting}, Temweka.`;
+    greetingElement.textContent =
+        `${greeting}, Temweka.`;
 }
+
 
 /* =========================================================
    SAVE APPLICATIONS
@@ -82,12 +105,13 @@ function updateGreeting() {
 
 function saveApplications() {
     localStorage.setItem(
-        "hiresyncApplications",
+        "jobtselaApplications",
         JSON.stringify(applications)
     );
 
     updateUpcomingInterviews();
 }
+
 
 /* =========================================================
    UPCOMING INTERVIEWS
@@ -132,6 +156,7 @@ function updateUpcomingInterviews() {
     if (interviews.length === 0) {
         upcomingInterviews.innerHTML = `
             <div class="empty-state">
+
                 <div class="empty-icon">
                     +
                 </div>
@@ -141,9 +166,10 @@ function updateUpcomingInterviews() {
                 </h3>
 
                 <p>
-                    Interviews you schedule in HireSync
+                    Interviews you schedule in JobTsela
                     will appear here.
                 </p>
+
             </div>
         `;
 
@@ -184,7 +210,9 @@ function updateUpcomingInterviews() {
 
             card.innerHTML = `
                 <div class="interview-card-header">
+
                     <div>
+
                         <h3>
                             ${application.company}
                         </h3>
@@ -192,14 +220,17 @@ function updateUpcomingInterviews() {
                         <p>
                             ${application.role}
                         </p>
+
                     </div>
 
                     <span>
                         INTERVIEW
                     </span>
+
                 </div>
 
                 <div class="interview-details">
+
                     <p>
                         📅 ${date}
                     </p>
@@ -217,6 +248,7 @@ function updateUpcomingInterviews() {
                             `
                             : ""
                     }
+
                 </div>
             `;
 
@@ -224,6 +256,7 @@ function updateUpcomingInterviews() {
         }
     );
 }
+
 
 /* =========================================================
    DASHBOARD ELEMENTS
@@ -250,11 +283,13 @@ const searchApplications =
 const statusFilter =
     document.querySelector("#status-filter");
 
+
 /* =========================================================
    SEARCH AND FILTER
    ========================================================= */
 
 if (searchApplications && statusFilter) {
+
     searchApplications.addEventListener(
         "input",
         () => {
@@ -270,11 +305,13 @@ if (searchApplications && statusFilter) {
     );
 }
 
+
 /* =========================================================
    UPDATE DASHBOARD STATISTICS
    ========================================================= */
 
 function updateStatistics() {
+
     const assessments =
         applications.filter(
             application =>
@@ -320,7 +357,9 @@ function updateStatistics() {
         );
 
     if (responseRate) {
+
         if (applications.length > 0) {
+
             const rate =
                 Math.round(
                     (responses.length / applications.length) * 100
@@ -328,12 +367,15 @@ function updateStatistics() {
 
             responseRate.textContent =
                 `${rate}%`;
+
         } else {
+
             responseRate.textContent =
                 "0%";
         }
     }
 }
+
 
 /* =========================================================
    KANBAN COLUMNS
@@ -341,6 +383,7 @@ function updateStatistics() {
 
 const kanbanColumns =
     document.querySelectorAll(".kanban-column");
+
 
 /* =========================================================
    APPLICATIONS PAGE
@@ -358,11 +401,13 @@ const applicationsPageFilter =
 const applicationsPageSort =
     document.querySelector("#applicationSort");
 
+
 /* =========================================================
    APPLICATION SUMMARY
    ========================================================= */
 
 function updateApplicationSummary() {
+
     const summaryTotal =
         document.querySelector("#summary-total");
 
@@ -429,11 +474,13 @@ function updateApplicationSummary() {
     }
 }
 
+
 /* =========================================================
    CLOSING DATE STATUS
    ========================================================= */
 
 function getClosingDateStatus(closingDate) {
+
     if (!closingDate) {
         return {
             className: "",
@@ -441,7 +488,8 @@ function getClosingDateStatus(closingDate) {
         };
     }
 
-    const today = new Date();
+    const today =
+        new Date();
 
     today.setHours(
         0,
@@ -452,7 +500,7 @@ function getClosingDateStatus(closingDate) {
 
     const deadline =
         new Date(
-            closingDate + "T00:00:00"
+            `${closingDate}T00:00:00`
         );
 
     const difference =
@@ -462,6 +510,7 @@ function getClosingDateStatus(closingDate) {
         );
 
     if (difference < 0) {
+
         return {
             className: "closing-overdue",
             label: "⚠️ Closing date passed"
@@ -469,6 +518,7 @@ function getClosingDateStatus(closingDate) {
     }
 
     if (difference === 0) {
+
         return {
             className: "closing-today",
             label: "🔴 Closes today"
@@ -476,23 +526,28 @@ function getClosingDateStatus(closingDate) {
     }
 
     if (difference <= 3) {
+
         return {
             className: "closing-soon",
-            label: `🟡 Closes in ${difference} day${difference === 1 ? "" : "s"}`
+            label:
+                `🟡 Closes in ${difference} day${difference === 1 ? "" : "s"}`
         };
     }
 
     return {
         className: "closing-normal",
-        label: `⏳ Closes in ${difference} days`
+        label:
+            `⏳ Closes in ${difference} days`
     };
 }
+
 
 /* =========================================================
    RENDER APPLICATIONS PAGE
    ========================================================= */
 
 function renderApplicationsPage() {
+
     if (!applicationsPageList) {
         return;
     }
@@ -514,24 +569,27 @@ function renderApplicationsPage() {
     const filteredApplications =
         applications.filter(
             application => {
+
                 const matchesSearch =
                     application.company
                         .toLowerCase()
                         .includes(searchTerm)
+
                     ||
+
                     application.role
                         .toLowerCase()
                         .includes(searchTerm)
+
                     ||
+
                     (application.location || "")
                         .toLowerCase()
                         .includes(searchTerm);
 
                 const matchesStatus =
-                    selectedStatus === "all"
-                    ||
-                    selectedStatus === "All"
-                    ||
+                    selectedStatus === "all" ||
+                    selectedStatus === "All" ||
                     application.status === selectedStatus;
 
                 return (
@@ -541,16 +599,19 @@ function renderApplicationsPage() {
             }
         );
 
+
     /* Sort applications */
 
     const sortedApplications =
         [...filteredApplications].sort(
             (a, b) => {
+
                 switch (
                     applicationsPageSort
                         ? applicationsPageSort.value
                         : "newest"
                 ) {
+
                     case "oldest":
                         return (
                             new Date(
@@ -595,10 +656,13 @@ function renderApplicationsPage() {
             }
         );
 
+
     applicationsPageList.innerHTML = "";
+
 
     sortedApplications.forEach(
         application => {
+
             const card =
                 document.createElement("div");
 
@@ -612,6 +676,7 @@ function renderApplicationsPage() {
 
             card.innerHTML = `
                 <div class="application-card-header">
+
                     <h3>
                         ${application.company}
                     </h3>
@@ -619,6 +684,7 @@ function renderApplicationsPage() {
                     <span class="application-status status-${statusClass}">
                         ${application.status}
                     </span>
+
                 </div>
 
                 <p class="application-role">
@@ -658,6 +724,7 @@ function renderApplicationsPage() {
                 ${
                     application.closingDate
                         ? (() => {
+
                             const closingStatus =
                                 getClosingDateStatus(
                                     application.closingDate
@@ -665,6 +732,7 @@ function renderApplicationsPage() {
 
                             return `
                                 <div class="application-closing ${closingStatus.className}">
+
                                     <strong>
                                         ${closingStatus.label}
                                     </strong>
@@ -672,6 +740,7 @@ function renderApplicationsPage() {
                                     <span>
                                         Deadline: ${application.closingDate}
                                     </span>
+
                                 </div>
                             `;
                         })()
@@ -682,6 +751,7 @@ function renderApplicationsPage() {
                     application.jobUrl
                         ? `
                             <p class="application-url">
+
                                 🔗
 
                                 <a
@@ -691,6 +761,7 @@ function renderApplicationsPage() {
                                 >
                                     View Job Posting
                                 </a>
+
                             </p>
                         `
                         : ""
@@ -707,6 +778,7 @@ function renderApplicationsPage() {
                 }
 
                 <div class="application-actions">
+
                     <button
                         class="edit-btn"
                         data-id="${application.id}"
@@ -720,6 +792,7 @@ function renderApplicationsPage() {
                     >
                         Delete
                     </button>
+
                 </div>
             `;
 
@@ -727,6 +800,7 @@ function renderApplicationsPage() {
         }
     );
 }
+
 
 /* =========================================================
    APPLICATIONS PAGE CONTROLS
@@ -736,6 +810,7 @@ if (
     applicationsPageSearch &&
     applicationsPageFilter
 ) {
+
     applicationsPageSearch.addEventListener(
         "input",
         renderApplicationsPage
@@ -747,6 +822,7 @@ if (
     );
 
     if (applicationsPageSort) {
+
         applicationsPageSort.addEventListener(
             "change",
             renderApplicationsPage
@@ -754,11 +830,13 @@ if (
     }
 }
 
+
 /* =========================================================
    RENDER APPLICATION CARDS
    ========================================================= */
 
 function renderApplications() {
+
     document
         .querySelectorAll(".application-list")
         .forEach(
@@ -782,24 +860,27 @@ function renderApplications() {
     const filteredApplications =
         applications.filter(
             application => {
+
                 const matchesSearch =
                     application.company
                         .toLowerCase()
                         .includes(searchTerm)
+
                     ||
+
                     application.role
                         .toLowerCase()
                         .includes(searchTerm)
+
                     ||
+
                     (application.location || "")
                         .toLowerCase()
                         .includes(searchTerm);
 
                 const matchesStatus =
-                    selectedStatus === "All"
-                    ||
-                    selectedStatus === "all"
-                    ||
+                    selectedStatus === "All" ||
+                    selectedStatus === "all" ||
                     application.status === selectedStatus;
 
                 return (
@@ -809,8 +890,10 @@ function renderApplications() {
             }
         );
 
+
     filteredApplications.forEach(
         application => {
+
             const card =
                 document.createElement("div");
 
@@ -829,6 +912,7 @@ function renderApplications() {
 
             card.innerHTML = `
                 <div class="application-card-header">
+
                     <h3>
                         ${application.company}
                     </h3>
@@ -836,6 +920,7 @@ function renderApplications() {
                     <span class="application-status status-${statusClass}">
                         ${application.status}
                     </span>
+
                 </div>
 
                 <p class="application-role">
@@ -875,6 +960,7 @@ function renderApplications() {
                 ${
                     application.closingDate
                         ? (() => {
+
                             const closingStatus =
                                 getClosingDateStatus(
                                     application.closingDate
@@ -882,6 +968,7 @@ function renderApplications() {
 
                             return `
                                 <div class="application-closing ${closingStatus.className}">
+
                                     <strong>
                                         ${closingStatus.label}
                                     </strong>
@@ -889,6 +976,7 @@ function renderApplications() {
                                     <span>
                                         Deadline: ${application.closingDate}
                                     </span>
+
                                 </div>
                             `;
                         })()
@@ -899,6 +987,7 @@ function renderApplications() {
                     application.jobUrl
                         ? `
                             <p class="application-url">
+
                                 🔗
 
                                 <a
@@ -908,6 +997,7 @@ function renderApplications() {
                                 >
                                     View Job Posting
                                 </a>
+
                             </p>
                         `
                         : ""
@@ -924,6 +1014,7 @@ function renderApplications() {
                 }
 
                 <div class="application-actions">
+
                     <button
                         class="edit-btn"
                         data-id="${application.id}"
@@ -937,15 +1028,20 @@ function renderApplications() {
                     >
                         Delete
                     </button>
+
                 </div>
             `;
+
 
             /* Drag start */
 
             card.addEventListener(
                 "dragstart",
                 event => {
-                    card.classList.add("dragging");
+
+                    card.classList.add(
+                        "dragging"
+                    );
 
                     event.dataTransfer.setData(
                         "text/plain",
@@ -957,20 +1053,24 @@ function renderApplications() {
                 }
             );
 
+
             /* Drag end */
 
             card.addEventListener(
                 "dragend",
                 () => {
+
                     card.classList.remove(
                         "dragging"
                     );
                 }
             );
 
+
             const targetColumn =
                 [...kanbanColumns].find(
                     column => {
+
                         const columnTitle =
                             column.querySelector(
                                 ".column-header span"
@@ -985,14 +1085,19 @@ function renderApplications() {
                     }
                 );
 
+
             if (targetColumn) {
+
                 const applicationList =
                     targetColumn.querySelector(
                         ".application-list"
                     );
 
                 if (applicationList) {
-                    applicationList.appendChild(card);
+
+                    applicationList.appendChild(
+                        card
+                    );
                 }
             }
         }
@@ -1001,13 +1106,16 @@ function renderApplications() {
     updateColumnCounts();
 }
 
+
 /* =========================================================
    UPDATE KANBAN COUNTERS
    ========================================================= */
 
 function updateColumnCounts() {
+
     kanbanColumns.forEach(
         column => {
+
             const columnTitle =
                 column.querySelector(
                     ".column-header span"
@@ -1037,6 +1145,7 @@ function updateColumnCounts() {
     );
 }
 
+
 /* =========================================================
    DRAG AND DROP
    ========================================================= */
@@ -1045,9 +1154,11 @@ document
     .querySelectorAll(".kanban-column")
     .forEach(
         column => {
+
             column.addEventListener(
                 "dragover",
                 event => {
+
                     event.preventDefault();
 
                     event.dataTransfer.dropEffect =
@@ -1055,9 +1166,11 @@ document
                 }
             );
 
+
             column.addEventListener(
                 "drop",
                 event => {
+
                     event.preventDefault();
 
                     const id =
@@ -1093,24 +1206,34 @@ document
                         newStatus;
 
                     saveApplications();
+
                     renderApplications();
+
                     updateStatistics();
+
                     updateColumnCounts();
+
                     renderApplicationsPage();
+
                     updateAIInbox();
+
                     updateUpcomingInterviews();
+
                     renderInterviewsPage();
+
                     renderAnalyticsPage();
                 }
             );
         }
     );
 
+
 /* =========================================================
    AI INBOX
    ========================================================= */
 
 function updateAIInbox() {
+
     const aiInbox =
         document.querySelector("#ai-inbox");
 
@@ -1119,51 +1242,76 @@ function updateAIInbox() {
     }
 
     if (applications.length === 0) {
+
         aiInbox.innerHTML = `
-            <p>No applications to analyse yet.</p>
+            <p>
+                No applications to analyse yet.
+            </p>
         `;
 
         return;
     }
 
+
     const recommendations =
         applications.map(
             application => {
+
                 let message = "";
 
+
                 switch (application.status) {
+
                     case "Applied":
+
                         message =
                             "Consider following up if you have not received a response.";
+
                         break;
+
 
                     case "Assessment":
+
                         message =
                             "Assessment stage. Complete any required tests and prepare for the next step.";
+
                         break;
+
 
                     case "Interview":
+
                         message =
                             "Interview stage. Prepare questions, research the company, and review the role.";
+
                         break;
+
 
                     case "Offer":
+
                         message =
                             "Offer received. Review the salary, benefits, conditions, and next steps.";
+
                         break;
+
 
                     case "Rejected":
+
                         message =
                             "Application closed. Consider similar opportunities and continue applying.";
+
                         break;
 
+
                     default:
+
                         message =
                             "Review this application and update its status when needed.";
                 }
 
+
                 return `
                     <div class="ai-recommendation">
+
                         <strong>
                             ${application.company}
                         </strong>
@@ -1175,14 +1323,17 @@ function updateAIInbox() {
                         <p>
                             ${message}
                         </p>
+
                     </div>
                 `;
             }
         );
 
+
     aiInbox.innerHTML =
         recommendations.join("");
 }
+
 
 /* =========================================================
    APPLICATION MODAL
@@ -1220,14 +1371,17 @@ const hasApplicationModal =
     cancelModalButton &&
     applicationForm;
 
+
 /* =========================================================
    OPEN MODAL
    ========================================================= */
 
 if (hasApplicationModal) {
+
     openModalButton.addEventListener(
         "click",
         () => {
+
             applicationForm.reset();
 
             editingApplicationId =
@@ -1260,29 +1414,35 @@ if (hasApplicationModal) {
     );
 }
 
+
 /* =========================================================
    CLOSE MODAL
    ========================================================= */
 
 if (hasApplicationModal) {
+
     closeModalButton.addEventListener(
         "click",
         () => {
+
             modal.classList.remove(
                 "active"
             );
         }
     );
 }
+
 
 /* =========================================================
    CANCEL FORM
    ========================================================= */
 
 if (hasApplicationModal) {
+
     cancelModalButton.addEventListener(
         "click",
         () => {
+
             modal.classList.remove(
                 "active"
             );
@@ -1290,15 +1450,19 @@ if (hasApplicationModal) {
     );
 }
 
+
 /* =========================================================
    CLOSE MODAL OUTSIDE
    ========================================================= */
 
 if (hasApplicationModal) {
+
     modal.addEventListener(
         "click",
         event => {
+
             if (event.target === modal) {
+
                 modal.classList.remove(
                     "active"
                 );
@@ -1307,15 +1471,19 @@ if (hasApplicationModal) {
     );
 }
 
+
 /* =========================================================
    APPLICATION FORM
    ========================================================= */
 
 if (hasApplicationModal) {
+
     applicationForm.addEventListener(
         "submit",
         event => {
+
             event.preventDefault();
+
 
             /* Get form values */
 
@@ -1374,11 +1542,13 @@ if (hasApplicationModal) {
                     "#notes"
                 ).value.trim();
 
+
             /* Edit existing application */
 
             if (
                 editingApplicationId !== null
             ) {
+
                 const application =
                     applications.find(
                         application =>
@@ -1387,6 +1557,7 @@ if (hasApplicationModal) {
                     );
 
                 if (application) {
+
                     application.company =
                         company;
 
@@ -1420,22 +1591,48 @@ if (hasApplicationModal) {
                     application.notes =
                         notes;
                 }
+
             } else {
+
+
                 /* Create new application */
 
                 const newApplication = {
+
                     id: Date.now(),
-                    company: company,
-                    role: role,
-                    location: location,
-                    status: status,
-                    applicationDate: applicationDate,
-                    interviewDate: interviewDate,
-                    interviewTime: interviewTime,
-                    salary: salary,
-                    closingDate: closingDate,
-                    jobUrl: jobUrl,
-                    notes: notes
+
+                    company:
+                        company,
+
+                    role:
+                        role,
+
+                    location:
+                        location,
+
+                    status:
+                        status,
+
+                    applicationDate:
+                        applicationDate,
+
+                    interviewDate:
+                        interviewDate,
+
+                    interviewTime:
+                        interviewTime,
+
+                    salary:
+                        salary,
+
+                    closingDate:
+                        closingDate,
+
+                    jobUrl:
+                        jobUrl,
+
+                    notes:
+                        notes
                 };
 
                 applications.push(
@@ -1443,9 +1640,11 @@ if (hasApplicationModal) {
                 );
             }
 
+
             /* Save changes */
 
             saveApplications();
+
 
             /* Refresh dashboard */
 
@@ -1454,18 +1653,27 @@ if (hasApplicationModal) {
                     ".kanban-column"
                 )
             ) {
+
                 updateStatistics();
+
                 renderApplications();
+
                 updateColumnCounts();
             }
+
 
             /* Refresh applications page */
 
             renderApplicationsPage();
+
             updateAIInbox();
+
             updateUpcomingInterviews();
+
             renderInterviewsPage();
+
             renderAnalyticsPage();
+
 
             /* Reset form */
 
@@ -1473,6 +1681,7 @@ if (hasApplicationModal) {
 
             editingApplicationId =
                 null;
+
 
             /* Restore Add mode */
 
@@ -1487,11 +1696,13 @@ if (hasApplicationModal) {
                 );
 
             if (modalTitle) {
+
                 modalTitle.textContent =
                     "Add Job Application";
             }
 
             if (submitButton) {
+
                 submitButton.textContent =
                     "Add Application";
             }
@@ -1503,6 +1714,7 @@ if (hasApplicationModal) {
     );
 }
 
+
 /* =========================================================
    DELETE APPLICATION
    ========================================================= */
@@ -1510,6 +1722,7 @@ if (hasApplicationModal) {
 document.addEventListener(
     "click",
     event => {
+
         if (
             !event.target.classList.contains(
                 "delete-btn"
@@ -1541,6 +1754,7 @@ document.addEventListener(
 
         saveApplications();
 
+
         /* Dashboard refresh */
 
         if (
@@ -1548,19 +1762,27 @@ document.addEventListener(
                 ".kanban-column"
             )
         ) {
+
             updateStatistics();
+
             renderApplications();
+
             updateColumnCounts();
         }
+
 
         /* Applications page refresh */
 
         renderApplicationsPage();
+
         updateAIInbox();
+
         renderInterviewsPage();
+
         renderAnalyticsPage();
     }
 );
+
 
 /* =========================================================
    EDIT APPLICATION
@@ -1569,6 +1791,7 @@ document.addEventListener(
 document.addEventListener(
     "click",
     event => {
+
         if (
             !event.target.classList.contains(
                 "edit-btn"
@@ -1599,6 +1822,7 @@ document.addEventListener(
 
         editingApplicationId =
             applicationId;
+
 
         /* Fill the form */
 
@@ -1657,6 +1881,7 @@ document.addEventListener(
         ).value =
             application.notes || "";
 
+
         /* Update modal */
 
         const modalTitle =
@@ -1670,11 +1895,13 @@ document.addEventListener(
             );
 
         if (modalTitle) {
+
             modalTitle.textContent =
                 "Edit Job Application";
         }
 
         if (submitButton) {
+
             submitButton.textContent =
                 "Save Changes";
         }
@@ -1685,19 +1912,21 @@ document.addEventListener(
     }
 );
 
+
 /* =========================================================
    INTERVIEWS PAGE
    ========================================================= */
 
 function renderInterviewsPage() {
+
     const interviewsList =
-        document.querySelector(
-            "#interviewsList"
-        );
+        document.querySelector("#interviewsList") ||
+        document.querySelector("#upcoming-interviews");
 
     if (!interviewsList) {
         return;
     }
+
 
     const totalElement =
         document.querySelector(
@@ -1719,9 +1948,12 @@ function renderInterviewsPage() {
             "#interview-completed"
         );
 
-    const now = new Date();
 
-    const today = new Date();
+    const now =
+        new Date();
+
+    const today =
+        new Date();
 
     today.setHours(
         0,
@@ -1730,6 +1962,7 @@ function renderInterviewsPage() {
         0
     );
 
+
     const interviews =
         applications
             .filter(
@@ -1737,21 +1970,26 @@ function renderInterviewsPage() {
                     application.status === "Interview" &&
                     application.interviewDate
             )
-            .map(application => {
-                const dateTime =
-                    new Date(
-                        `${application.interviewDate}T${application.interviewTime || "23:59"}`
-                    );
+            .map(
+                application => {
 
-                return {
-                    application,
-                    dateTime
-                };
-            })
+                    const dateTime =
+                        new Date(
+                            `${application.interviewDate}T${application.interviewTime || "23:59"}`
+                        );
+
+                    return {
+                        application,
+                        dateTime
+                    };
+                }
+            )
             .sort(
                 (a, b) =>
-                    a.dateTime - b.dateTime
+                    a.dateTime -
+                    b.dateTime
             );
+
 
     const upcoming =
         interviews.filter(
@@ -1759,12 +1997,14 @@ function renderInterviewsPage() {
                 interview.dateTime >= now
         );
 
+
     const todayInterviews =
         interviews.filter(
             interview => {
+
                 const interviewDay =
                     new Date(
-                        interview.application.interviewDate
+                        `${interview.application.interviewDate}T00:00:00`
                     );
 
                 interviewDay.setHours(
@@ -1781,11 +2021,13 @@ function renderInterviewsPage() {
             }
         );
 
+
     const completed =
         interviews.filter(
             interview =>
                 interview.dateTime < now
         );
+
 
     if (totalElement) {
         totalElement.textContent =
@@ -1807,9 +2049,12 @@ function renderInterviewsPage() {
             completed.length;
     }
 
+
     if (interviews.length === 0) {
+
         interviewsList.innerHTML = `
             <div class="empty-state">
+
                 <div class="empty-icon">
                     +
                 </div>
@@ -1822,21 +2067,26 @@ function renderInterviewsPage() {
                     Add an interview date and time
                     to an application to see it here.
                 </p>
+
             </div>
         `;
 
         return;
     }
 
+
     interviewsList.innerHTML = "";
+
 
     interviews.forEach(
         ({ application, dateTime }) => {
+
             const card =
                 document.createElement("div");
 
             card.className =
                 "interview-card";
+
 
             const date =
                 dateTime.toLocaleDateString(
@@ -1849,6 +2099,7 @@ function renderInterviewsPage() {
                     }
                 );
 
+
             const time =
                 application.interviewTime
                     ? dateTime.toLocaleTimeString(
@@ -1860,14 +2111,18 @@ function renderInterviewsPage() {
                     )
                     : "Time not set";
 
+
             const completedLabel =
                 dateTime < now
                     ? "COMPLETED"
                     : "UPCOMING";
 
+
             card.innerHTML = `
                 <div class="interview-card-header">
+
                     <div>
+
                         <h3>
                             ${application.company}
                         </h3>
@@ -1875,14 +2130,17 @@ function renderInterviewsPage() {
                         <p>
                             ${application.role}
                         </p>
+
                     </div>
 
                     <span>
                         ${completedLabel}
                     </span>
+
                 </div>
 
                 <div class="interview-details">
+
                     <p>
                         📅 ${date}
                     </p>
@@ -1900,6 +2158,7 @@ function renderInterviewsPage() {
                             `
                             : ""
                     }
+
                 </div>
             `;
 
@@ -1908,6 +2167,7 @@ function renderInterviewsPage() {
     );
 }
 
+
 /* =========================================================
    ANALYTICS PAGE
    ========================================================= */
@@ -1915,13 +2175,18 @@ function renderInterviewsPage() {
 function renderAnalyticsPage() {
 
     const breakdown =
-        document.querySelector("#analytics-breakdown");
+        document.querySelector(
+            "#analytics-breakdown"
+        );
 
     if (!breakdown) {
         return;
     }
 
-    const total = applications.length;
+
+    const total =
+        applications.length;
+
 
     const applied =
         applications.filter(
@@ -1929,11 +2194,13 @@ function renderAnalyticsPage() {
                 application.status === "Applied"
         ).length;
 
+
     const assessment =
         applications.filter(
             application =>
                 application.status === "Assessment"
         ).length;
+
 
     const interviews =
         applications.filter(
@@ -1941,11 +2208,13 @@ function renderAnalyticsPage() {
                 application.status === "Interview"
         ).length;
 
+
     const offers =
         applications.filter(
             application =>
                 application.status === "Offer"
         ).length;
+
 
     const rejected =
         applications.filter(
@@ -1953,10 +2222,12 @@ function renderAnalyticsPage() {
                 application.status === "Rejected"
         ).length;
 
+
     const active =
         applied +
         assessment +
         interviews;
+
 
     const responses =
         assessment +
@@ -1964,73 +2235,107 @@ function renderAnalyticsPage() {
         offers +
         rejected;
 
+
     const responseRate =
         total > 0
-            ? Math.round((responses / total) * 100)
+            ? Math.round(
+                (responses / total) * 100
+            )
             : 0;
+
 
     const interviewRate =
         total > 0
-            ? Math.round((interviews / total) * 100)
+            ? Math.round(
+                (interviews / total) * 100
+            )
             : 0;
+
 
     const offerRate =
         total > 0
-            ? Math.round((offers / total) * 100)
+            ? Math.round(
+                (offers / total) * 100
+            )
             : 0;
 
 
     /* Update summary */
 
     const analyticsTotal =
-        document.querySelector("#analytics-total");
+        document.querySelector(
+            "#analytics-total"
+        );
 
     const analyticsActive =
-        document.querySelector("#analytics-active");
+        document.querySelector(
+            "#analytics-active"
+        );
 
     const analyticsInterviews =
-        document.querySelector("#analytics-interviews");
+        document.querySelector(
+            "#analytics-interviews"
+        );
 
     const analyticsOffers =
-        document.querySelector("#analytics-offers");
+        document.querySelector(
+            "#analytics-offers"
+        );
 
     const analyticsResponseRate =
-        document.querySelector("#analytics-response-rate");
+        document.querySelector(
+            "#analytics-response-rate"
+        );
 
     const analyticsInterviewRate =
-        document.querySelector("#analytics-interview-rate");
+        document.querySelector(
+            "#analytics-interview-rate"
+        );
 
     const analyticsOfferRate =
-        document.querySelector("#analytics-offer-rate");
+        document.querySelector(
+            "#analytics-offer-rate"
+        );
 
 
     if (analyticsTotal) {
-        analyticsTotal.textContent = total;
+
+        analyticsTotal.textContent =
+            total;
     }
 
     if (analyticsActive) {
-        analyticsActive.textContent = active;
+
+        analyticsActive.textContent =
+            active;
     }
 
     if (analyticsInterviews) {
-        analyticsInterviews.textContent = interviews;
+
+        analyticsInterviews.textContent =
+            interviews;
     }
 
     if (analyticsOffers) {
-        analyticsOffers.textContent = offers;
+
+        analyticsOffers.textContent =
+            offers;
     }
 
     if (analyticsResponseRate) {
+
         analyticsResponseRate.textContent =
             `${responseRate}%`;
     }
 
     if (analyticsInterviewRate) {
+
         analyticsInterviewRate.textContent =
             `${interviewRate}%`;
     }
 
     if (analyticsOfferRate) {
+
         analyticsOfferRate.textContent =
             `${offerRate}%`;
     }
@@ -2066,61 +2371,68 @@ function renderAnalyticsPage() {
     /* Application breakdown */
 
     const stages = [
+
         {
             label: "Applied",
             count: applied
         },
+
         {
             label: "Assessment",
             count: assessment
         },
+
         {
             label: "Interview",
             count: interviews
         },
+
         {
             label: "Offer",
             count: offers
         },
+
         {
             label: "Rejected",
             count: rejected
         }
+
     ];
 
 
     breakdown.innerHTML = `
         <div class="analytics-breakdown">
 
-            ${stages.map(stage => {
+            ${stages.map(
+                stage => {
 
-                const percentage =
-                    (stage.count / total) * 100;
+                    const percentage =
+                        (stage.count / total) * 100;
 
-                return `
-                    <div class="analytics-row">
+                    return `
+                        <div class="analytics-row">
 
-                        <div class="analytics-label">
-                            ${stage.label}
+                            <div class="analytics-label">
+                                ${stage.label}
+                            </div>
+
+                            <div class="analytics-bar">
+
+                                <div
+                                    class="analytics-bar-fill"
+                                    style="width: ${percentage}%"
+                                ></div>
+
+                            </div>
+
+                            <div class="analytics-count">
+                                ${stage.count}
+                            </div>
+
                         </div>
-
-                        <div class="analytics-bar">
-
-                            <div
-                                class="analytics-bar-fill"
-                                style="width: ${percentage}%"
-                            ></div>
-
-                        </div>
-
-                        <div class="analytics-count">
-                            ${stage.count}
-                        </div>
-
-                    </div>
-                `;
-
-            }).join("")}
+                    `;
+                }
+            ).join("")}
 
         </div>
     `;
@@ -2132,16 +2444,26 @@ function renderAnalyticsPage() {
    ========================================================= */
 
 if (
-    document.querySelector(".kanban-column")
+    document.querySelector(
+        ".kanban-column"
+    )
 ) {
+
     updateStatistics();
+
     renderApplications();
+
     updateColumnCounts();
 }
 
 renderApplicationsPage();
+
 updateAIInbox();
+
 updateUpcomingInterviews();
+
 renderInterviewsPage();
+
 renderAnalyticsPage();
+
 updateGreeting();
