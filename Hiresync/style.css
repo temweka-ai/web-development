@@ -1787,3 +1787,335 @@ footer p {
         font-size: 24px;
     }
 }
+
+/* =========================================================
+   AI INBOX GMAIL ACTIONS
+========================================================= */
+
+.ai-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.gmail-connect-btn {
+    padding: 9px 14px;
+    border: 1px solid #4F8CFF;
+    border-radius: 8px;
+    background: transparent;
+    color: #4F8CFF;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.gmail-connect-btn:hover {
+    background: #4F8CFF;
+    color: white;
+}
+
+/* =========================================================
+   AI INBOX RECOMMENDATIONS
+========================================================= */
+
+.ai-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+/* Individual AI cards */
+
+.ai-recommendation {
+    padding: 16px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    background: #11141B;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+
+    gap: 6px 14px;
+
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+
+/* Hover */
+
+.ai-recommendation:hover {
+    border-color: rgba(79, 140, 255, 0.45);
+    background: #151922;
+    transform: translateY(-1px);
+}
+
+
+/* Main title */
+
+.ai-recommendation strong {
+    color: #E8ECF3;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+
+/* Status / category */
+
+.ai-recommendation > span {
+    justify-self: end;
+
+    padding: 4px 8px;
+
+    border-radius: 6px;
+
+    background: rgba(79, 140, 255, 0.10);
+    border: 1px solid rgba(79, 140, 255, 0.20);
+
+    color: #7FAEFF;
+
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+
+/* Message / subject */
+
+.ai-recommendation p {
+    grid-column: 1 / -1;
+
+    margin: 2px 0 0;
+
+    color: #B7BFCC;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    word-break: break-word;
+}
+
+
+/* Sender */
+
+.ai-recommendation small {
+    grid-column: 1 / -1;
+
+    margin-top: 2px;
+
+    color: #6F7887;
+
+    font-size: 11px;
+    line-height: 1.4;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* Gmail cards */
+
+.gmail-recommendation {
+    border-left: 3px solid #4F8CFF;
+}
+
+
+/* Gmail label */
+
+.gmail-recommendation > span {
+    color: #7FAEFF;
+}
+
+
+/* Empty state */
+
+.ai-empty {
+    padding: 28px 20px;
+
+    border: 1px dashed rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+
+    text-align: center;
+
+    background: #101319;
+}
+
+.ai-empty h3 {
+    margin: 0 0 8px;
+
+    color: #DDE3EC;
+
+    font-size: 14px;
+}
+
+.ai-empty p {
+    margin: 0;
+
+    color: #737D8D;
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   AI INTELLIGENCE CATEGORY CARDS
+========================================================= */
+
+.ai-card-main {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+/* Email subject */
+
+.ai-card-main strong {
+    color: #E8ECF3;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Sender */
+
+.ai-card-main small {
+    color: #6F7887;
+
+    font-size: 11px;
+    line-height: 1.4;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* Category badge */
+
+.ai-category-badge {
+    align-self: start;
+
+    padding: 5px 9px;
+
+    border-radius: 6px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+
+/* Recruitment */
+
+.ai-recommendation.recruitment {
+    border-left: 3px solid #4F8CFF;
+}
+
+.ai-recommendation.recruitment
+.ai-category-badge {
+    color: #7FAEFF;
+
+    background: rgba(79, 140, 255, 0.10);
+
+    border: 1px solid rgba(79, 140, 255, 0.20);
+}
+
+
+/* Interview */
+
+.ai-recommendation.interview {
+    border-left: 3px solid #9B7CFF;
+}
+
+.ai-recommendation.interview
+.ai-category-badge {
+    color: #B59CFF;
+
+    background: rgba(155, 124, 255, 0.10);
+
+    border: 1px solid rgba(155, 124, 255, 0.20);
+}
+
+
+/* Assessment */
+
+.ai-recommendation.assessment {
+    border-left: 3px solid #D6A84F;
+}
+
+.ai-recommendation.assessment
+.ai-category-badge {
+    color: #E5C477;
+
+    background: rgba(214, 168, 79, 0.10);
+
+    border: 1px solid rgba(214, 168, 79, 0.20);
+}
+
+
+/* Offer */
+
+.ai-recommendation.offer {
+    border-left: 3px solid #4CAF7A;
+}
+
+.ai-recommendation.offer
+.ai-category-badge {
+    color: #72D39A;
+
+    background: rgba(76, 175, 122, 0.10);
+
+    border: 1px solid rgba(76, 175, 122, 0.20);
+}
+
+
+/* Rejection */
+
+.ai-recommendation.rejection {
+    border-left: 3px solid #C85C6A;
+}
+
+.ai-recommendation.rejection
+.ai-category-badge {
+    color: #E17B88;
+
+    background: rgba(200, 92, 106, 0.10);
+
+    border: 1px solid rgba(200, 92, 106, 0.20);
+}
+
+
+/* Recruiter */
+
+.ai-recommendation.recruiter {
+    border-left: 3px solid #6FA8A8;
+}
+
+.ai-recommendation.recruiter
+.ai-category-badge {
+    color: #8FCACA;
+
+    background: rgba(111, 168, 168, 0.10);
+
+    border: 1px solid rgba(111, 168, 168, 0.20);
+}

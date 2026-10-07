@@ -24,12 +24,23 @@
         content="#0B0D12"
     >
 
-    <title>JobTsela | Career Command Center</title>
+    <title>
+        JobTsela
+    </title>
 
     <link
         rel="stylesheet"
         href="style.css"
     >
+
+    <!-- Google Identity Services -->
+    <script
+        src="https://accounts.google.com/gsi/client"
+        async
+        defer>
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js"></script>
 </head>
 
 <body>
@@ -64,12 +75,29 @@
 
         </div>
 
-        <div class="nav-user">
-            TM
+        <!-- Google Sign In -->
+        <div class="google-auth">
+
+            <div
+                id="g_id_onload"
+                data-client_id="305432009603-cl1fnje5n7mkrvh5tpkii4d0pu8fdpon.apps.googleusercontent.com"
+                data-callback="handleCredentialResponse"
+                data-auto_prompt="false">
+            </div>
+
+            <div
+                class="g_id_signin"
+                data-type="standard"
+                data-theme="outline"
+                data-size="medium"
+                data-text="signin_with"
+                data-shape="rectangular"
+                data-logo_alignment="left">
+            </div>
+
         </div>
 
     </nav>
-
 
     <main>
 
@@ -94,14 +122,13 @@
 
             <button
                 class="add-job-btn"
-                id="open-modal"
+                id="dashboard-open-modal"
                 type="button"
             >
                 + Add Application
             </button>
 
         </section>
-
 
         <!-- Statistics -->
         <section class="stats-grid">
@@ -122,7 +149,6 @@
 
             </div>
 
-
             <div class="stat-card">
 
                 <p class="stat-label">
@@ -138,7 +164,6 @@
                 </p>
 
             </div>
-
 
             <div class="stat-card">
 
@@ -156,7 +181,6 @@
 
             </div>
 
-
             <div class="stat-card">
 
                 <p class="stat-label">
@@ -172,7 +196,6 @@
                 </p>
 
             </div>
-
 
             <div class="stat-card">
 
@@ -192,7 +215,6 @@
 
         </section>
 
-
         <!-- Main Dashboard -->
         <section class="dashboard-grid">
 
@@ -208,20 +230,12 @@
                         </p>
 
                         <h2>
-                            My Applications
+                            Applications
                         </h2>
 
                     </div>
 
-                    <button
-                        class="view-all"
-                        type="button"
-                    >
-                        View All
-                    </button>
-
                 </div>
-
 
                 <!-- Search and Filter -->
                 <div class="application-controls">
@@ -239,7 +253,6 @@
                         >
 
                     </div>
-
 
                     <div class="filter-box">
 
@@ -279,7 +292,6 @@
 
                 </div>
 
-
                 <!-- Kanban Board -->
                 <div class="kanban-board">
 
@@ -302,7 +314,6 @@
 
                     </div>
 
-
                     <!-- Assessment -->
                     <div class="kanban-column">
 
@@ -321,7 +332,6 @@
                         <div class="application-list"></div>
 
                     </div>
-
 
                     <!-- Interview -->
                     <div class="kanban-column">
@@ -342,7 +352,6 @@
 
                     </div>
 
-
                     <!-- Offer -->
                     <div class="kanban-column">
 
@@ -361,7 +370,6 @@
                         <div class="application-list"></div>
 
                     </div>
-
 
                     <!-- Rejected -->
                     <div class="kanban-column">
@@ -386,7 +394,6 @@
 
             </div>
 
-
             <!-- Upcoming Interviews -->
             <div class="panel interviews-panel">
 
@@ -405,7 +412,6 @@
                     </div>
 
                 </div>
-
 
                 <div id="upcoming-interviews">
 
@@ -432,9 +438,92 @@
 
         </section>
 
+        <!-- CV PROFILE -->
+        <section
+            class="panel cv-profile-panel"
+            id="cv-profile"
+        >
+
+            <div class="panel-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        CAREER PROFILE
+                    </p>
+
+                    <h2>
+                        Your CV
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="cv-upload-area">
+
+                <div class="cv-upload-copy">
+
+                    <h3>
+                        Upload your current CV
+                    </h3>
+
+                    <p>
+                        JobTsela will use your CV as the foundation for your career profile,
+                        job matching, CV improvements and interview preparation.
+                    </p>
+
+                    <p class="cv-upload-note">
+                        PDF or DOCX · Maximum 5 MB
+                    </p>
+
+                </div>
+
+                <input
+                    type="file"
+                    id="cv-file"
+                    accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                >
+
+                <div
+                    id="cv-status"
+                    class="cv-status"
+                    aria-live="polite"
+                >
+                    No CV uploaded yet.
+                </div>
+
+                <div class="cv-actions">
+
+                    <button
+                        type="button"
+                        id="remove-cv"
+                        class="cancel-btn"
+                        disabled
+                    >
+                        Remove CV
+                    </button>
+
+                    <button
+                        type="button"
+                        id="build-cv-with-ai"
+                        class="submit-btn"
+                        disabled
+                    >
+                        Build CV With AI
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
 
         <!-- AI Inbox -->
-        <section class="ai-inbox">
+        <section
+            class="ai-inbox"
+            id="ai-inbox"
+        >
 
             <div class="panel-header">
 
@@ -450,31 +539,50 @@
 
                 </div>
 
-                <span class="ai-status">
-                    ● STANDBY
-                </span>
+                <div class="ai-actions">
+
+                    <span
+                        class="ai-status"
+                        id="ai-status"
+                    >
+                        ● STANDBY
+                    </span>
+
+                    <button
+                        type="button"
+                        id="connect-gmail"
+                        class="gmail-connect-btn"
+                    >
+                        Connect Gmail
+                    </button>
+
+                </div>
 
             </div>
 
+            <div
+                class="ai-content"
+                id="ai-content"
+            >
 
-            <div class="ai-empty">
+                <div class="ai-empty">
 
-                <h3>
-                    Your recruitment intelligence will appear here.
-                </h3>
+                    <h3>
+                        Your recruitment intelligence will appear here.
+                    </h3>
 
-                <p>
-                    JobTsela will eventually analyse recruiter emails
-                    and automatically identify interviews, assessments,
-                    rejections and offers.
-                </p>
+                    <p>
+                        JobTsela will analyse your applications
+                        and provide career recommendations.
+                    </p>
+
+                </div>
 
             </div>
 
         </section>
 
     </main>
-
 
     <!-- Footer -->
     <footer>
@@ -489,11 +597,10 @@
 
     </footer>
 
-
     <!-- Add/Edit Application Modal -->
     <div
         class="modal-overlay"
-        id="application-modal"
+        id="dashboard-application-modal"
     >
 
         <div class="modal">
@@ -514,7 +621,7 @@
 
                 <button
                     class="close-modal"
-                    id="close-modal"
+                    id="dashboard-close-modal"
                     type="button"
                 >
                     ×
@@ -522,9 +629,8 @@
 
             </div>
 
-
             <!-- Application Form -->
-            <form id="application-form">
+            <form id="dashboard-application-form">
 
                 <div class="form-group">
 
@@ -535,12 +641,12 @@
                     <input
                         type="text"
                         id="company"
+                        name="company"
                         placeholder="e.g. Microsoft"
                         required
                     >
 
                 </div>
-
 
                 <div class="form-group">
 
@@ -551,12 +657,12 @@
                     <input
                         type="text"
                         id="role"
+                        name="role"
                         placeholder="e.g. Junior Front-End Developer"
                         required
                     >
 
                 </div>
-
 
                 <div class="form-row">
 
@@ -569,11 +675,11 @@
                         <input
                             type="text"
                             id="location"
+                            name="location"
                             placeholder="e.g. Johannesburg"
                         >
 
                     </div>
-
 
                     <div class="form-group">
 
@@ -581,7 +687,10 @@
                             Status
                         </label>
 
-                        <select id="status">
+                        <select
+                            id="status"
+                            name="status"
+                        >
 
                             <option value="Applied">
                                 Applied
@@ -609,7 +718,6 @@
 
                 </div>
 
-
                 <div class="form-group">
 
                     <label for="application-date">
@@ -619,10 +727,10 @@
                     <input
                         type="date"
                         id="application-date"
+                        name="applicationDate"
                     >
 
                 </div>
-
 
                 <div class="form-row">
 
@@ -635,10 +743,10 @@
                         <input
                             type="date"
                             id="interview-date"
+                            name="interviewDate"
                         >
 
                     </div>
-
 
                     <div class="form-group">
 
@@ -649,12 +757,12 @@
                         <input
                             type="time"
                             id="interview-time"
+                            name="interviewTime"
                         >
 
                     </div>
 
                 </div>
-
 
                 <div class="form-group">
 
@@ -665,11 +773,11 @@
                     <input
                         type="text"
                         id="salary"
+                        name="salary"
                         placeholder="e.g. R15,000 per month"
                     >
 
                 </div>
-
 
                 <div class="form-group">
 
@@ -680,10 +788,10 @@
                     <input
                         type="date"
                         id="closing-date"
+                        name="closingDate"
                     >
 
                 </div>
-
 
                 <div class="form-group">
 
@@ -694,11 +802,11 @@
                     <input
                         type="url"
                         id="job-url"
+                        name="jobUrl"
                         placeholder="https://..."
                     >
 
                 </div>
-
 
                 <div class="form-group">
 
@@ -708,19 +816,19 @@
 
                     <textarea
                         id="notes"
+                        name="notes"
                         rows="4"
                         placeholder="Add any notes about this application..."
                     ></textarea>
 
                 </div>
 
-
                 <div class="form-actions">
 
                     <button
                         type="button"
                         class="cancel-btn"
-                        id="cancel-modal"
+                        id="dashboard-cancel-modal"
                     >
                         Cancel
                     </button>
@@ -728,7 +836,7 @@
                     <button
                         type="submit"
                         class="submit-btn"
-                        id="submit-application"
+                        id="dashboard-submit-application"
                     >
                         Add Application
                     </button>
@@ -740,7 +848,6 @@
         </div>
 
     </div>
-
 
     <script src="script.js"></script>
 

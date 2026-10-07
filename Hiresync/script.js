@@ -1,1051 +1,1355 @@
-/* =========================================================
-   JOBTSELA JAVASCRIPT
-   ========================================================= */
+(() => {
+    /* =========================================================
+       JOBTSELA JAVASCRIPT
+    ========================================================= */
 
+    const defaultApplications = [
+        {
+            id: 1,
+            company: "Motus Corporation",
+            role: "Apprentice Level 1",
+            location: "Sandton, Gauteng",
+            status: "Applied",
+            applicationDate: ""
+        },
+        {
+            id: 2,
+            company: "Takealot",
+            role: "Junior Developer",
+            location: "Cape Town / Remote",
+            status: "Interview",
+            applicationDate: ""
+        },
+        {
+            id: 3,
+            company: "TymeBank",
+            role: "Software Developer",
+            location: "Johannesburg",
+            status: "Offer",
+            applicationDate: ""
+        }
+    ];
 
-/* =========================================================
-   DEMO APPLICATIONS
-   ========================================================= */
-
-const defaultApplications = [
-    {
-        id: 1,
-        company: "Motus Corporation",
-        role: "Apprentice Level 1",
-        location: "Sandton, Gauteng",
-        status: "Applied",
-        applicationDate: ""
-    },
-
-    {
-        id: 2,
-        company: "Takealot",
-        role: "Junior Developer",
-        location: "Cape Town / Remote",
-        status: "Interview",
-        applicationDate: ""
-    },
-
-    {
-        id: 3,
-        company: "TymeBank",
-        role: "Software Developer",
-        location: "Johannesburg",
-        status: "Offer",
-        applicationDate: ""
-    }
-];
-
-
-/* =========================================================
-   LOAD SAVED APPLICATIONS
-   ========================================================= */
-
-const savedApplications =
-    localStorage.getItem("jobtselaApplications");
-
-const legacyApplications =
-    localStorage.getItem("hiresyncApplications");
-
-let applications;
-
-if (savedApplications) {
-    applications = JSON.parse(savedApplications);
-} else if (legacyApplications) {
-    applications = JSON.parse(legacyApplications);
-
-    localStorage.setItem(
-        "jobtselaApplications",
-        JSON.stringify(applications)
-    );
-} else {
-    applications = defaultApplications;
-}
-
-
-/* =========================================================
-   EDITING STATE
-   ========================================================= */
-
-let editingApplicationId = null;
-
-
-/* =========================================================
-   DYNAMIC GREETING
-   ========================================================= */
-
-function updateGreeting() {
-    const greetingElement =
-        document.getElementById("greeting");
-
-    if (!greetingElement) {
-        return;
+    function safeGetStorageItem(key) {
+        try {
+            return localStorage.getItem(key);
+        } catch (error) {
+            console.warn(`localStorage access failed for "${key}"`, error);
+            return null;
+        }
     }
 
-    const hour = new Date().getHours();
+    function safeParseJSON(value, fallback) {
+        if (!value) return fallback;
 
-    let greeting;
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            console.error("Could not parse stored JSON:", error);
+            return fallback;
+        }
+    }
 
-    if (hour >= 5 && hour < 12) {
-        greeting = "Good morning";
-    } else if (hour >= 12 && hour < 18) {
-        greeting = "Good afternoon";
+    function normalizeApplication(app = {}) {
+        return {
+            ...app,
+            id: Number(app.id ?? Date.now()),
+            company: String(app.company ?? "").trim(),
+            role: String(app.role ?? "").trim(),
+            location: String(app.location ?? "").trim(),
+            status: String(app.status ?? "Applied").trim(),
+            applicationDate: app.applicationDate ?? "",
+            interviewDate: app.interviewDate ?? "",
+            interviewTime: app.interviewTime ?? "",
+            salary: app.salary ?? "",
+            closingDate: app.closingDate ?? "",
+            jobUrl: app.jobUrl ?? "",
+            notes: app.notes ?? ""
+        };
+    }
+
+    const savedApplications = safeGetStorageItem("jobtselaApplications");
+    const legacyApplications = safeGetStorageItem("hiresyncApplications");
+
+    let applications;
+
+    if (savedApplications) {
+        applications = safeParseJSON(savedApplications, defaultApplications);
+    } else if (legacyApplications) {
+        applications = safeParseJSON(legacyApplications, defaultApplications);
+
+        try {
+            localStorage.setItem("jobtselaApplications", JSON.stringify(applications));
+        } catch (error) {
+            console.warn("Could not migrate legacy applications:", error);
+        }
     } else {
-        greeting = "Good evening";
+        applications = defaultApplications;
     }
 
-    greetingElement.textContent =
-        `${greeting}, Temweka.`;
-}
-
-
-/* =========================================================
-   SAVE APPLICATIONS
-   ========================================================= */
-
-function saveApplications() {
-    localStorage.setItem(
-        "jobtselaApplications",
-        JSON.stringify(applications)
-    );
-
-    updateUpcomingInterviews();
-}
-
-
-/* =========================================================
-   UPCOMING INTERVIEWS
-   ========================================================= */
-
-function updateUpcomingInterviews() {
-    const upcomingInterviews =
-        document.querySelector("#upcoming-interviews");
-
-    if (!upcomingInterviews) {
-        return;
+    if (!Array.isArray(applications) || applications.length === 0) {
+        applications = defaultApplications;
     }
 
-    const now = new Date();
+    applications = applications.map(normalizeApplication);
+    let editingApplicationId = null;
 
-    const interviews = applications
-        .filter(
-            application =>
-                application.status === "Interview" &&
-                application.interviewDate
-        )
-        .map(application => {
-            const interviewDateTime = new Date(
-                `${application.interviewDate}T${application.interviewTime || "23:59"}`
+    function escapeHTML(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function normalizeText(text) {
+        return String(text || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9\s]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+    }
+
+    function updateGreeting() {
+        const greetingElement = document.getElementById("greeting");
+        if (!greetingElement) return;
+
+        let userName = "Temweka";
+
+        const savedUser = safeGetStorageItem("jobtselaUser");
+        if (savedUser) {
+            try {
+                const user = JSON.parse(savedUser);
+                if (user.name) userName = user.name;
+            } catch (error) {
+                console.error("Could not load saved Google user.", error);
+            }
+        }
+
+        const hour = new Date().getHours();
+        let greeting = "Good evening";
+
+        if (hour >= 5 && hour < 12) {
+            greeting = "Good morning";
+        } else if (hour >= 12 && hour < 18) {
+            greeting = "Good afternoon";
+        }
+
+        greetingElement.textContent = `${greeting}, ${userName}.`;
+    }
+
+    window.handleCredentialResponse = function (response) {
+        if (!response || !response.credential) {
+            console.error("Google credential response is missing.");
+            return;
+        }
+
+        try {
+            const payload = JSON.parse(
+                atob(
+                    response.credential
+                        .split(".")[1]
+                        .replace(/-/g, "+")
+                        .replace(/_/g, "/")
+                )
             );
 
-            return {
-                application,
-                interviewDateTime
+            const user = {
+                id: payload.sub,
+                name: payload.name,
+                email: payload.email,
+                picture: payload.picture
             };
-        })
-        .filter(
-            interview =>
-                interview.interviewDateTime >= now
-        )
-        .sort(
-            (a, b) =>
-                a.interviewDateTime -
-                b.interviewDateTime
-        );
 
-    if (interviews.length === 0) {
-        upcomingInterviews.innerHTML = `
-            <div class="empty-state">
+            try {
+                localStorage.setItem("jobtselaUser", JSON.stringify(user));
+            } catch (error) {
+                console.warn("Could not save Google user:", error);
+            }
 
-                <div class="empty-icon">
-                    +
-                </div>
+            updateGreeting();
+            console.log("Google user signed in:", user);
+        } catch (error) {
+            console.error("Google sign-in failed:", error);
+        }
+    };
 
-                <h3>
-                    No upcoming interviews
-                </h3>
+    let gmailTokenClient = null;
+    let gmailAccessToken = null;
 
-                <p>
-                    Interviews you schedule in JobTsela
-                    will appear here.
-                </p>
+    function updateGmailStatus(statusText = "Connect Gmail", connected = false) {
+        const gmailButton = document.querySelector("#connect-gmail");
+        const aiStatus = document.querySelector("#ai-status");
 
-            </div>
-        `;
+        if (gmailButton) {
+            gmailButton.textContent = statusText;
+            gmailButton.disabled = connected;
+        }
 
-        return;
+        if (aiStatus) {
+            aiStatus.textContent = connected ? "● GMAIL CONNECTED" : "● GMAIL STANDBY";
+        }
     }
 
-    upcomingInterviews.innerHTML = "";
+    function initializeGmailOAuth() {
+        if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
+            console.error("Google OAuth library is not available.");
+            updateGmailStatus("Gmail unavailable", false);
+            return false;
+        }
 
-    interviews.forEach(
-        ({ application, interviewDateTime }) => {
-            const card =
-                document.createElement("div");
+        gmailTokenClient = window.google.accounts.oauth2.initTokenClient({
+            client_id: "305432009603-cl1fnje5n7mkrvh5tpkii4d0pu8fdpon.apps.googleusercontent.com",
+            scope: "https://www.googleapis.com/auth/gmail.readonly",
+            callback: async function (response) {
+                if (response.error) {
+                    console.error("Gmail authorization failed:", response);
+                    updateGmailStatus("Gmail authorization failed", false);
+                    return;
+                }
 
-            card.className =
-                "interview-card";
+                gmailAccessToken = response.access_token;
+                updateGmailStatus("Gmail Connected", true);
+                await loadGmailMessages();
+            }
+        });
 
-            const date =
-                interviewDateTime.toLocaleDateString(
-                    undefined,
-                    {
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric"
-                    }
+        return true;
+    }
+
+    function decodeGmailBody(data) {
+        if (!data) return "";
+
+        try {
+            let base64 = data.replace(/-/g, "+").replace(/_/g, "/");
+
+            while (base64.length % 4) {
+                base64 += "=";
+            }
+
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+
+            return new TextDecoder("utf-8").decode(bytes);
+        } catch (error) {
+            console.error("Failed to decode Gmail body:", error);
+            return "";
+        }
+    }
+
+    function stripHTML(html) {
+        if (!html) return "";
+
+        const temp = document.createElement("div");
+        temp.innerHTML = html;
+        return temp.textContent || temp.innerText || "";
+    }
+
+    function extractGmailBody(payload) {
+        if (!payload) return "";
+
+        if (payload.body && payload.body.data) {
+            const decoded = decodeGmailBody(payload.body.data);
+
+            if (payload.mimeType === "text/html") {
+                return stripHTML(decoded);
+            }
+
+            return decoded;
+        }
+
+        if (payload.parts && payload.parts.length) {
+            for (const part of payload.parts) {
+                if (part.mimeType === "text/plain" && part.body && part.body.data) {
+                    return decodeGmailBody(part.body.data);
+                }
+            }
+
+            for (const part of payload.parts) {
+                if (part.mimeType === "text/html" && part.body && part.body.data) {
+                    return stripHTML(decodeGmailBody(part.body.data));
+                }
+            }
+
+            for (const part of payload.parts) {
+                const body = extractGmailBody(part);
+                if (body) return body;
+            }
+        }
+
+        return "";
+    }
+
+    function parseGmailMessage(message) {
+        if (!message) return null;
+
+        const headers = message.payload?.headers || [];
+        const getHeader = (name) => {
+            const header = headers.find(
+                (header) => header.name.toLowerCase() === name.toLowerCase()
+            );
+
+            return header ? header.value : "";
+        };
+
+        const sender = getHeader("From");
+        const subject = getHeader("Subject");
+        const date = getHeader("Date");
+        const body = extractGmailBody(message.payload);
+
+        return {
+            id: message.id,
+            sender,
+            subject,
+            date,
+            body
+        };
+    }
+
+    function connectGmail() {
+        const initialized = initializeGmailOAuth();
+
+        if (!initialized) {
+            console.error("Gmail connection could not be initialized.");
+            return;
+        }
+
+        if (!gmailTokenClient) {
+            console.error("Gmail token client is not available.");
+            return;
+        }
+
+        gmailTokenClient.requestAccessToken({ prompt: "consent" });
+    }
+
+    function matchGmailToApplication(message) {
+        if (!message) return null;
+
+        const messageText = normalizeText(
+            `${message.subject || ""} ${message.sender || ""} ${message.body || ""}`
+        );
+
+        if (!messageText) return null;
+
+        let bestMatch = null;
+        let bestScore = 0;
+
+        applications.forEach((application) => {
+            const company = normalizeText(application?.company || "");
+            const role = normalizeText(application?.role || "");
+
+            if (!company) return;
+
+            let score = 0;
+
+            if (messageText.includes(company)) {
+                score += 5;
+            }
+
+            const companyWords = company.split(" ").filter((word) => word.length >= 4);
+
+            companyWords.forEach((word) => {
+                if (messageText.includes(word)) {
+                    score += 1;
+                }
+            });
+
+            if (role && messageText.includes(role)) {
+                score += 3;
+            }
+
+            const roleWords = role
+                .split(" ")
+                .filter((word) =>
+                    word.length >= 4 &&
+                    ![
+                        "junior",
+                        "senior",
+                        "developer",
+                        "software",
+                        "position",
+                        "application",
+                        "career",
+                        "remote"
+                    ].includes(word)
                 );
 
-            const time =
-                application.interviewTime
-                    ? interviewDateTime.toLocaleTimeString(
-                        undefined,
+            roleWords.forEach((word) => {
+                if (messageText.includes(word)) {
+                    score += 1;
+                }
+            });
+
+            if (score > bestScore && score >= 5) {
+                bestScore = score;
+                bestMatch = application;
+            }
+        });
+
+        return bestMatch;
+    }
+
+    function buildGmailAnalysis(message, category, relevance) {
+        const analysed = {
+            ...message,
+            category,
+            relevance
+        };
+
+        analysed.matchedApplication = matchGmailToApplication(analysed);
+        return analysed;
+    }
+
+    function analyseGmailMessage(message) {
+        const subject = normalizeText(message.subject);
+        const sender = normalizeText(message.sender);
+        const body = normalizeText(message.body);
+        const fullText = `${subject} ${sender} ${body}`;
+
+        const linkedinSocialKeywords = [
+            "new post for you",
+            "is popular in your network",
+            "recently posted",
+            "new invitation",
+            "hired near you",
+            "new connection",
+            "liked your",
+            "commented on your",
+            "celebrated",
+            "view profile",
+            "co founder recently posted"
+        ];
+
+        if (
+            sender.includes("linkedin") &&
+            linkedinSocialKeywords.some((keyword) =>
+                fullText.includes(normalizeText(keyword))
+            )
+        ) {
+            return buildGmailAnalysis(message, "NOISE", "LOW");
+        }
+
+        const noiseKeywords = [
+            "games",
+            "solve zip",
+            "solve the puzzle",
+            "newsletter",
+            "daily digest",
+            "unsubscribe"
+        ];
+
+        if (
+            noiseKeywords.some((keyword) =>
+                subject.includes(normalizeText(keyword))
+            )
+        ) {
+            return buildGmailAnalysis(message, "NOISE", "LOW");
+        }
+
+        const interviewKeywords = [
+            "interview",
+            "interview invitation",
+            "interview request",
+            "schedule your interview",
+            "schedule an interview",
+            "invite you to an interview",
+            "next round interview",
+            "interview process",
+            "meet with our team",
+            "meet the team"
+        ];
+
+        if (
+            interviewKeywords.some((keyword) =>
+                fullText.includes(normalizeText(keyword))
+            )
+        ) {
+            return buildGmailAnalysis(message, "INTERVIEW", "HIGH");
+        }
+
+        const assessmentKeywords = [
+            "assessment",
+            "online assessment",
+            "coding assessment",
+            "technical assessment",
+            "coding challenge",
+            "technical test",
+            "coding test",
+            "take the assessment",
+            "complete the assessment"
+        ];
+
+        if (
+            assessmentKeywords.some((keyword) =>
+                fullText.includes(normalizeText(keyword))
+            )
+        ) {
+            return buildGmailAnalysis(message, "ASSESSMENT", "HIGH");
+        }
+
+        const offerKeywords = [
+            "job offer",
+            "offer letter",
+            "offer of employment",
+            "employment offer",
+            "pleased to offer",
+            "offer you the position",
+            "offer you the role"
+        ];
+
+        if (
+            offerKeywords.some((keyword) =>
+                fullText.includes(normalizeText(keyword))
+            )
+        ) {
+            return buildGmailAnalysis(message, "OFFER", "HIGH");
+        }
+
+        const rejectionKeywords = [
+            "application unsuccessful",
+            "not been successful",
+            "not selected",
+            "unsuccessful application",
+            "will not be progressing",
+            "not moving forward",
+            "we regret to inform",
+            "decided not to proceed"
+        ];
+
+        if (
+            rejectionKeywords.some((keyword) =>
+                fullText.includes(normalizeText(keyword))
+            )
+        ) {
+            return buildGmailAnalysis(message, "REJECTION", "MEDIUM");
+        }
+
+        const applicationKeywords = [
+            "application received",
+            "application submitted",
+            "thank you for applying",
+            "thanks for applying",
+            "application has been received",
+            "we received your application",
+            "thank you for your application",
+            "application confirmation",
+            "your application for"
+        ];
+
+        if (
+            applicationKeywords.some((keyword) =>
+                fullText.includes(normalizeText(keyword))
+            )
+        ) {
+            return buildGmailAnalysis(message, "APPLICATION", "MEDIUM");
+        }
+
+        const recruiterKeywords = [
+            "recruiter",
+            "recruitment",
+            "talent acquisition",
+            "hiring manager",
+            "career opportunity",
+            "job opportunity",
+            "position available",
+            "we are hiring",
+            "talent team",
+            "recruiting team"
+        ];
+
+        if (
+            recruiterKeywords.some((keyword) =>
+                fullText.includes(normalizeText(keyword))
+            )
+        ) {
+            return buildGmailAnalysis(message, "RECRUITER", "HIGH");
+        }
+
+        const recruitmentKeywords = [
+            "job",
+            "jobs",
+            "hiring",
+            "hired",
+            "vacancy",
+            "position",
+            "career",
+            "developer",
+            "development",
+            "software",
+            "internship",
+            "intern",
+            "recruiting",
+            "recruitment",
+            "candidate",
+            "apply",
+            "application",
+            "role",
+            "openings",
+            "cyber security",
+            "data entry",
+            "customer support",
+            "call center",
+            "appointment setter",
+            "job opportunity",
+            "job opening",
+            "employment"
+        ];
+
+        if (
+            recruitmentKeywords.some((keyword) =>
+                fullText.includes(normalizeText(keyword))
+            )
+        ) {
+            return buildGmailAnalysis(message, "RECRUITMENT", "MEDIUM");
+        }
+
+        return buildGmailAnalysis(message, "OTHER", "LOW");
+    }
+
+    async function loadGmailMessages() {
+        if (!gmailAccessToken) {
+            console.error("Gmail is not connected.");
+            updateGmailStatus("Connect Gmail", false);
+            return;
+        }
+
+        try {
+            updateGmailStatus("Loading Gmail...", true);
+
+            const listResponse = await fetch(
+                "https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=20",
+                {
+                    headers: {
+                        Authorization: `Bearer ${gmailAccessToken}`
+                    }
+                }
+            );
+
+            if (listResponse.status === 401) {
+                gmailAccessToken = null;
+                console.error("Gmail access token expired or is invalid.");
+                updateGmailStatus("Reconnect Gmail", false);
+                return;
+            }
+
+            if (!listResponse.ok) {
+                throw new Error(`Gmail message list error: ${listResponse.status}`);
+            }
+
+            const listData = await listResponse.json();
+            const messages = listData.messages || [];
+            const fullMessages = [];
+
+            for (const message of messages) {
+                try {
+                    const messageResponse = await fetch(
+                        `https://gmail.googleapis.com/gmail/v1/users/me/messages/${message.id}?format=full`,
                         {
-                            hour: "numeric",
-                            minute: "2-digit"
+                            headers: {
+                                Authorization: `Bearer ${gmailAccessToken}`
+                            }
                         }
-                    )
-                    : "Time not set";
+                    );
+
+                    if (messageResponse.status === 401) {
+                        gmailAccessToken = null;
+                        updateGmailStatus("Reconnect Gmail", false);
+                        return;
+                    }
+
+                    if (!messageResponse.ok) {
+                        console.error(`Failed to read Gmail message ${message.id}`);
+                        continue;
+                    }
+
+                    const messageData = await messageResponse.json();
+                    fullMessages.push(messageData);
+                } catch (messageError) {
+                    console.error(
+                        `Error reading Gmail message ${message.id}:`,
+                        messageError
+                    );
+                }
+            }
+
+            window.gmailMessages = fullMessages;
+
+            const parsedMessages = fullMessages
+                .map((message) => parseGmailMessage(message))
+                .filter((message) => message !== null);
+
+            window.parsedGmailMessages = parsedMessages;
+
+            const analysedMessages = parsedMessages.map((message) =>
+                analyseGmailMessage(message)
+            );
+
+            window.analysedGmailMessages = analysedMessages;
+
+            window.analysedGmailMessages.sort((a, b) => {
+                const dateA = new Date(a.date || 0);
+                const dateB = new Date(b.date || 0);
+                return dateB - dateA;
+            });
+
+            updateGmailStatus("Gmail Connected", true);
+            updateAIInbox();
+        } catch (error) {
+            console.error("Failed to load Gmail messages:", error);
+            updateGmailStatus("Gmail Error", false);
+        }
+    }
+
+    function saveApplications() {
+        try {
+            localStorage.setItem(
+                "jobtselaApplications",
+                JSON.stringify(applications)
+            );
+        } catch (error) {
+            console.warn("Could not save applications:", error);
+        }
+
+        updateUpcomingInterviews();
+    }
+
+    function updateUpcomingInterviews() {
+        const upcomingInterviews = document.querySelector("#upcoming-interviews");
+        if (!upcomingInterviews) return;
+
+        const now = new Date();
+
+        const interviews = applications
+            .filter(
+                (application) =>
+                    application.status === "Interview" &&
+                    application.interviewDate
+            )
+            .map((application) => {
+                const interviewDateTime = new Date(
+                    `${application.interviewDate}T${
+                        application.interviewTime || "23:59"
+                    }`
+                );
+
+                return { application, interviewDateTime };
+            })
+            .filter((interview) => interview.interviewDateTime >= now)
+            .sort(
+                (a, b) =>
+                    a.interviewDateTime - b.interviewDateTime
+            );
+
+        if (interviews.length === 0) {
+            upcomingInterviews.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">+</div>
+                    <h3>No upcoming interviews</h3>
+                    <p>Interviews you schedule in JobTsela will appear here.</p>
+                </div>
+            `;
+            return;
+        }
+
+        upcomingInterviews.innerHTML = "";
+
+        interviews.forEach(({ application, interviewDateTime }) => {
+            const card = document.createElement("div");
+            card.className = "interview-card";
+
+            const date = interviewDateTime.toLocaleDateString(undefined, {
+                weekday: "short",
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            });
+
+            const time = application.interviewTime
+                ? interviewDateTime.toLocaleTimeString(undefined, {
+                      hour: "numeric",
+                      minute: "2-digit"
+                  })
+                : "Time not set";
+
+            const completedLabel =
+                interviewDateTime < now ? "COMPLETED" : "UPCOMING";
 
             card.innerHTML = `
                 <div class="interview-card-header">
-
                     <div>
-
-                        <h3>
-                            ${application.company}
-                        </h3>
-
-                        <p>
-                            ${application.role}
-                        </p>
-
+                        <h3>${escapeHTML(application.company)}</h3>
+                        <p>${escapeHTML(application.role)}</p>
                     </div>
-
-                    <span>
-                        INTERVIEW
-                    </span>
-
+                    <span>${completedLabel}</span>
                 </div>
 
                 <div class="interview-details">
-
-                    <p>
-                        📅 ${date}
-                    </p>
-
-                    <p>
-                        🕒 ${time}
-                    </p>
-
+                    <p>📅 ${escapeHTML(date)}</p>
+                    <p>🕒 ${escapeHTML(time)}</p>
                     ${
                         application.location
-                            ? `
-                                <p>
-                                    📍 ${application.location}
-                                </p>
-                            `
+                            ? `<p>📍 ${escapeHTML(application.location)}</p>`
                             : ""
                     }
-
                 </div>
             `;
 
             upcomingInterviews.appendChild(card);
+        });
+    }
+
+    function getClosingDateStatus(closingDate) {
+        if (!closingDate) return { className: "", label: "" };
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const deadline = new Date(`${closingDate}T00:00:00`);
+        const difference = Math.ceil(
+            (deadline - today) / (1000 * 60 * 60 * 24)
+        );
+
+        if (difference < 0) {
+            return {
+                className: "closing-overdue",
+                label: "⚠️ Closing date passed"
+            };
         }
-    );
-}
 
-
-/* =========================================================
-   DASHBOARD ELEMENTS
-   ========================================================= */
-
-const totalApplications =
-    document.querySelector("#total-applications");
-
-const totalAssessments =
-    document.querySelector("#total-assessments");
-
-const totalInterviews =
-    document.querySelector("#total-interviews");
-
-const totalOffers =
-    document.querySelector("#total-offers");
-
-const responseRate =
-    document.querySelector("#response-rate");
-
-const searchApplications =
-    document.querySelector("#search-applications");
-
-const statusFilter =
-    document.querySelector("#status-filter");
-
-
-/* =========================================================
-   SEARCH AND FILTER
-   ========================================================= */
-
-if (searchApplications && statusFilter) {
-
-    searchApplications.addEventListener(
-        "input",
-        () => {
-            renderApplications();
+        if (difference === 0) {
+            return {
+                className: "closing-today",
+                label: "🔴 Closes today"
+            };
         }
-    );
 
-    statusFilter.addEventListener(
-        "change",
-        () => {
-            renderApplications();
+        if (difference <= 3) {
+            return {
+                className: "closing-soon",
+                label: `🟡 Closes in ${difference} day${
+                    difference === 1 ? "" : "s"
+                }`
+            };
         }
-    );
-}
 
-
-/* =========================================================
-   UPDATE DASHBOARD STATISTICS
-   ========================================================= */
-
-function updateStatistics() {
-
-    const assessments =
-        applications.filter(
-            application =>
-                application.status === "Assessment"
-        );
-
-    if (totalAssessments) {
-        totalAssessments.textContent =
-            assessments.length;
+        return {
+            className: "closing-normal",
+            label: `⏳ Closes in ${difference} days`
+        };
     }
 
-    if (totalApplications) {
-        totalApplications.textContent =
-            applications.length;
+    function updateApplicationSummary() {
+        const summaryTotal = document.querySelector("#summary-total");
+        if (!summaryTotal) return;
+
+        const summaryApplied = document.querySelector("#summary-applied");
+        const summaryAssessment =
+            document.querySelector("#summary-assessment");
+        const summaryInterview =
+            document.querySelector("#summary-interview");
+        const summaryOffer = document.querySelector("#summary-offer");
+        const summaryRejected =
+            document.querySelector("#summary-rejected");
+
+        summaryTotal.textContent = String(applications.length);
+
+        if (summaryApplied) {
+            summaryApplied.textContent = String(
+                applications.filter(
+                    (application) => application.status === "Applied"
+                ).length
+            );
+        }
+
+        if (summaryAssessment) {
+            summaryAssessment.textContent = String(
+                applications.filter(
+                    (application) => application.status === "Assessment"
+                ).length
+            );
+        }
+
+        if (summaryInterview) {
+            summaryInterview.textContent = String(
+                applications.filter(
+                    (application) => application.status === "Interview"
+                ).length
+            );
+        }
+
+        if (summaryOffer) {
+            summaryOffer.textContent = String(
+                applications.filter(
+                    (application) => application.status === "Offer"
+                ).length
+            );
+        }
+
+        if (summaryRejected) {
+            summaryRejected.textContent = String(
+                applications.filter(
+                    (application) => application.status === "Rejected"
+                ).length
+            );
+        }
     }
 
-    const interviews =
-        applications.filter(
-            application =>
-                application.status === "Interview"
+    const totalApplications = document.querySelector("#total-applications");
+    const totalAssessments =
+        document.querySelector("#total-assessments");
+    const totalInterviews =
+        document.querySelector("#total-interviews");
+    const totalOffers =
+        document.querySelector("#total-offers");
+    const responseRate =
+        document.querySelector("#response-rate");
+    const searchApplications =
+        document.querySelector("#search-applications");
+    const statusFilter =
+        document.querySelector("#status-filter");
+
+    function updateStatistics() {
+        const assessments = applications.filter(
+            (application) => application.status === "Assessment"
         );
 
-    if (totalInterviews) {
-        totalInterviews.textContent =
-            interviews.length;
-    }
+        if (totalAssessments) {
+            totalAssessments.textContent = String(
+                assessments.length
+            );
+        }
 
-    const offers =
-        applications.filter(
-            application =>
-                application.status === "Offer"
+        if (totalApplications) {
+            totalApplications.textContent = String(
+                applications.length
+            );
+        }
+
+        const interviews = applications.filter(
+            (application) => application.status === "Interview"
         );
 
-    if (totalOffers) {
-        totalOffers.textContent =
-            offers.length;
-    }
+        if (totalInterviews) {
+            totalInterviews.textContent = String(
+                interviews.length
+            );
+        }
 
-    const responses =
-        applications.filter(
-            application =>
-                application.status !== "Applied"
+        const offers = applications.filter(
+            (application) => application.status === "Offer"
         );
 
-    if (responseRate) {
+        if (totalOffers) {
+            totalOffers.textContent = String(
+                offers.length
+            );
+        }
 
-        if (applications.length > 0) {
+        const responses = applications.filter(
+            (application) => application.status !== "Applied"
+        );
 
-            const rate =
-                Math.round(
-                    (responses.length / applications.length) * 100
-                );
-
+        if (responseRate) {
             responseRate.textContent =
-                `${rate}%`;
-
-        } else {
-
-            responseRate.textContent =
-                "0%";
+                applications.length > 0
+                    ? `${Math.round(
+                          (responses.length / applications.length) * 100
+                      )}%`
+                    : "0%";
         }
     }
-}
 
+    const kanbanColumns =
+        document.querySelectorAll(".kanban-column");
+    const applicationsPageList =
+        document.querySelector("#applicationsList");
+    const applicationsPageSearch =
+        document.querySelector("#applicationSearch");
+    const applicationsPageFilter =
+        document.querySelector("#applicationFilter");
+    const applicationsPageSort =
+        document.querySelector("#applicationSort");
 
-/* =========================================================
-   KANBAN COLUMNS
-   ========================================================= */
+    function renderApplicationsPage() {
+        if (!applicationsPageList) return;
 
-const kanbanColumns =
-    document.querySelectorAll(".kanban-column");
+        updateApplicationSummary();
 
-
-/* =========================================================
-   APPLICATIONS PAGE
-   ========================================================= */
-
-const applicationsPageList =
-    document.querySelector("#applicationsList");
-
-const applicationsPageSearch =
-    document.querySelector("#applicationSearch");
-
-const applicationsPageFilter =
-    document.querySelector("#applicationFilter");
-
-const applicationsPageSort =
-    document.querySelector("#applicationSort");
-
-
-/* =========================================================
-   APPLICATION SUMMARY
-   ========================================================= */
-
-function updateApplicationSummary() {
-
-    const summaryTotal =
-        document.querySelector("#summary-total");
-
-    if (!summaryTotal) {
-        return;
-    }
-
-    const summaryApplied =
-        document.querySelector("#summary-applied");
-
-    const summaryAssessment =
-        document.querySelector("#summary-assessment");
-
-    const summaryInterview =
-        document.querySelector("#summary-interview");
-
-    const summaryOffer =
-        document.querySelector("#summary-offer");
-
-    const summaryRejected =
-        document.querySelector("#summary-rejected");
-
-    summaryTotal.textContent =
-        applications.length;
-
-    if (summaryApplied) {
-        summaryApplied.textContent =
-            applications.filter(
-                application =>
-                    application.status === "Applied"
-            ).length;
-    }
-
-    if (summaryAssessment) {
-        summaryAssessment.textContent =
-            applications.filter(
-                application =>
-                    application.status === "Assessment"
-            ).length;
-    }
-
-    if (summaryInterview) {
-        summaryInterview.textContent =
-            applications.filter(
-                application =>
-                    application.status === "Interview"
-            ).length;
-    }
-
-    if (summaryOffer) {
-        summaryOffer.textContent =
-            applications.filter(
-                application =>
-                    application.status === "Offer"
-            ).length;
-    }
-
-    if (summaryRejected) {
-        summaryRejected.textContent =
-            applications.filter(
-                application =>
-                    application.status === "Rejected"
-            ).length;
-    }
-}
-
-
-/* =========================================================
-   CLOSING DATE STATUS
-   ========================================================= */
-
-function getClosingDateStatus(closingDate) {
-
-    if (!closingDate) {
-        return {
-            className: "",
-            label: ""
-        };
-    }
-
-    const today =
-        new Date();
-
-    today.setHours(
-        0,
-        0,
-        0,
-        0
-    );
-
-    const deadline =
-        new Date(
-            `${closingDate}T00:00:00`
-        );
-
-    const difference =
-        Math.ceil(
-            (deadline - today) /
-            (1000 * 60 * 60 * 24)
-        );
-
-    if (difference < 0) {
-
-        return {
-            className: "closing-overdue",
-            label: "⚠️ Closing date passed"
-        };
-    }
-
-    if (difference === 0) {
-
-        return {
-            className: "closing-today",
-            label: "🔴 Closes today"
-        };
-    }
-
-    if (difference <= 3) {
-
-        return {
-            className: "closing-soon",
-            label:
-                `🟡 Closes in ${difference} day${difference === 1 ? "" : "s"}`
-        };
-    }
-
-    return {
-        className: "closing-normal",
-        label:
-            `⏳ Closes in ${difference} days`
-    };
-}
-
-
-/* =========================================================
-   RENDER APPLICATIONS PAGE
-   ========================================================= */
-
-function renderApplicationsPage() {
-
-    if (!applicationsPageList) {
-        return;
-    }
-
-    updateApplicationSummary();
-
-    const searchTerm =
-        applicationsPageSearch
-            ? applicationsPageSearch.value
-                .toLowerCase()
-                .trim()
+        const searchTerm = applicationsPageSearch
+            ? applicationsPageSearch.value.toLowerCase().trim()
             : "";
 
-    const selectedStatus =
-        applicationsPageFilter
+        const selectedStatus = applicationsPageFilter
             ? applicationsPageFilter.value
             : "all";
 
-    const filteredApplications =
-        applications.filter(
-            application => {
+        const filteredApplications = applications.filter(
+            (application) => {
+                const company = String(
+                    application?.company ?? ""
+                ).toLowerCase();
+
+                const role = String(
+                    application?.role ?? ""
+                ).toLowerCase();
+
+                const location = String(
+                    application?.location ?? ""
+                ).toLowerCase();
 
                 const matchesSearch =
-                    application.company
-                        .toLowerCase()
-                        .includes(searchTerm)
-
-                    ||
-
-                    application.role
-                        .toLowerCase()
-                        .includes(searchTerm)
-
-                    ||
-
-                    (application.location || "")
-                        .toLowerCase()
-                        .includes(searchTerm);
+                    company.includes(searchTerm) ||
+                    role.includes(searchTerm) ||
+                    location.includes(searchTerm);
 
                 const matchesStatus =
                     selectedStatus === "all" ||
                     selectedStatus === "All" ||
                     application.status === selectedStatus;
 
-                return (
-                    matchesSearch &&
-                    matchesStatus
-                );
+                return matchesSearch && matchesStatus;
             }
         );
 
-
-    /* Sort applications */
-
-    const sortedApplications =
-        [...filteredApplications].sort(
-            (a, b) => {
-
+        const sortedApplications =
+            [...filteredApplications].sort((a, b) => {
                 switch (
                     applicationsPageSort
                         ? applicationsPageSort.value
                         : "newest"
                 ) {
-
                     case "oldest":
                         return (
                             new Date(
-                                a.applicationDate || "9999-12-31"
+                                a.applicationDate ||
+                                    "9999-12-31"
                             ) -
                             new Date(
-                                b.applicationDate || "9999-12-31"
+                                b.applicationDate ||
+                                    "9999-12-31"
                             )
                         );
 
                     case "company":
-                        return a.company.localeCompare(
-                            b.company
+                        return String(
+                            a.company || ""
+                        ).localeCompare(
+                            String(b.company || "")
                         );
 
                     case "closing":
                         return (
                             new Date(
-                                a.closingDate || "9999-12-31"
+                                a.closingDate ||
+                                    "9999-12-31"
                             ) -
                             new Date(
-                                b.closingDate || "9999-12-31"
+                                b.closingDate ||
+                                    "9999-12-31"
                             )
                         );
 
                     case "status":
-                        return a.status.localeCompare(
-                            b.status
+                        return String(
+                            a.status || ""
+                        ).localeCompare(
+                            String(b.status || "")
                         );
 
                     case "newest":
                     default:
                         return (
                             new Date(
-                                b.applicationDate || "0000-01-01"
+                                b.applicationDate ||
+                                    "0000-01-01"
                             ) -
                             new Date(
-                                a.applicationDate || "0000-01-01"
+                                a.applicationDate ||
+                                    "0000-01-01"
                             )
                         );
                 }
-            }
-        );
+            });
 
+        applicationsPageList.innerHTML = "";
 
-    applicationsPageList.innerHTML = "";
+        sortedApplications.forEach((application) => {
+            const card = document.createElement("div");
+            card.className = "application-card";
 
-
-    sortedApplications.forEach(
-        application => {
-
-            const card =
-                document.createElement("div");
-
-            card.className =
-                "application-card";
-
-            const statusClass =
-                application.status
-                    .toLowerCase()
-                    .replace(/\s+/g, "-");
+            const statusClass = String(
+                application.status || ""
+            )
+                .toLowerCase()
+                .replace(/\s+/g, "-");
 
             card.innerHTML = `
                 <div class="application-card-header">
-
-                    <h3>
-                        ${application.company}
-                    </h3>
-
+                    <h3>${escapeHTML(application.company || "")}</h3>
                     <span class="application-status status-${statusClass}">
-                        ${application.status}
+                        ${escapeHTML(application.status || "")}
                     </span>
-
                 </div>
 
-                <p class="application-role">
-                    ${application.role}
-                </p>
+                <p class="application-role">${escapeHTML(
+                    application.role || ""
+                )}</p>
 
                 ${
                     application.location
-                        ? `
-                            <p class="application-location">
-                                📍 ${application.location}
-                            </p>
-                        `
+                        ? `<p class="application-location">📍 ${escapeHTML(
+                              application.location
+                          )}</p>`
                         : ""
                 }
 
                 ${
                     application.applicationDate
-                        ? `
-                            <p class="application-date">
-                                📅 ${application.applicationDate}
-                            </p>
-                        `
+                        ? `<p class="application-date">📅 ${escapeHTML(
+                              application.applicationDate
+                          )}</p>`
                         : ""
                 }
 
                 ${
                     application.salary
-                        ? `
-                            <p class="application-salary">
-                                💰 ${application.salary}
-                            </p>
-                        `
+                        ? `<p class="application-salary">💰 ${escapeHTML(
+                              application.salary
+                          )}</p>`
                         : ""
                 }
 
                 ${
                     application.closingDate
                         ? (() => {
+                              const closingStatus =
+                                  getClosingDateStatus(
+                                      application.closingDate
+                                  );
 
-                            const closingStatus =
-                                getClosingDateStatus(
-                                    application.closingDate
-                                );
-
-                            return `
-                                <div class="application-closing ${closingStatus.className}">
-
-                                    <strong>
-                                        ${closingStatus.label}
-                                    </strong>
-
-                                    <span>
-                                        Deadline: ${application.closingDate}
-                                    </span>
-
-                                </div>
-                            `;
-                        })()
+                              return `
+                                  <div class="application-closing ${closingStatus.className}">
+                                      <strong>${escapeHTML(
+                                          closingStatus.label
+                                      )}</strong>
+                                      <span>Deadline: ${escapeHTML(
+                                          application.closingDate
+                                      )}</span>
+                                  </div>
+                              `;
+                          })()
                         : ""
                 }
 
                 ${
                     application.jobUrl
-                        ? `
-                            <p class="application-url">
-
-                                🔗
-
-                                <a
-                                    href="${application.jobUrl}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    View Job Posting
-                                </a>
-
-                            </p>
-                        `
+                        ? `<p class="application-url">🔗 <a href="${escapeHTML(
+                              application.jobUrl
+                          )}" target="_blank" rel="noopener noreferrer">View Job Posting</a></p>`
                         : ""
                 }
 
                 ${
                     application.notes
-                        ? `
-                            <p class="application-notes">
-                                📝 ${application.notes}
-                            </p>
-                        `
+                        ? `<p class="application-notes">📝 ${escapeHTML(
+                              application.notes
+                          )}</p>`
                         : ""
                 }
 
                 <div class="application-actions">
-
-                    <button
-                        class="edit-btn"
-                        data-id="${application.id}"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        data-id="${application.id}"
-                    >
-                        Delete
-                    </button>
-
+                    <button class="edit-btn" data-id="${application.id}">Edit</button>
+                    <button class="delete-btn" data-id="${application.id}">Delete</button>
                 </div>
             `;
 
             applicationsPageList.appendChild(card);
-        }
-    );
-}
+        });
+    }
 
+    if (searchApplications && statusFilter) {
+        searchApplications.addEventListener(
+            "input",
+            renderApplications
+        );
 
-/* =========================================================
-   APPLICATIONS PAGE CONTROLS
-   ========================================================= */
+        statusFilter.addEventListener(
+            "change",
+            renderApplications
+        );
+    }
 
-if (
-    applicationsPageSearch &&
-    applicationsPageFilter
-) {
+    if (
+        applicationsPageSearch &&
+        applicationsPageFilter
+    ) {
+        applicationsPageSearch.addEventListener(
+            "input",
+            renderApplicationsPage
+        );
 
-    applicationsPageSearch.addEventListener(
-        "input",
-        renderApplicationsPage
-    );
-
-    applicationsPageFilter.addEventListener(
-        "change",
-        renderApplicationsPage
-    );
-
-    if (applicationsPageSort) {
-
-        applicationsPageSort.addEventListener(
+        applicationsPageFilter.addEventListener(
             "change",
             renderApplicationsPage
         );
+
+        if (applicationsPageSort) {
+            applicationsPageSort.addEventListener(
+                "change",
+                renderApplicationsPage
+            );
+        }
     }
-}
 
-
-/* =========================================================
-   RENDER APPLICATION CARDS
-   ========================================================= */
-
-function renderApplications() {
-
-    document
-        .querySelectorAll(".application-list")
-        .forEach(
-            list => {
+    function renderApplications() {
+        document
+            .querySelectorAll(".application-list")
+            .forEach((list) => {
                 list.innerHTML = "";
-            }
-        );
+            });
 
-    if (!searchApplications || !statusFilter) {
-        return;
-    }
+        if (!searchApplications || !statusFilter) return;
 
-    const searchTerm =
-        searchApplications.value
+        const searchTerm = searchApplications.value
             .toLowerCase()
             .trim();
 
-    const selectedStatus =
-        statusFilter.value;
+        const selectedStatus = statusFilter.value;
 
-    const filteredApplications =
-        applications.filter(
-            application => {
+        const filteredApplications =
+            applications.filter((application) => {
+                const company = String(
+                    application?.company ?? ""
+                ).toLowerCase();
+
+                const role = String(
+                    application?.role ?? ""
+                ).toLowerCase();
+
+                const location = String(
+                    application?.location ?? ""
+                ).toLowerCase();
 
                 const matchesSearch =
-                    application.company
-                        .toLowerCase()
-                        .includes(searchTerm)
-
-                    ||
-
-                    application.role
-                        .toLowerCase()
-                        .includes(searchTerm)
-
-                    ||
-
-                    (application.location || "")
-                        .toLowerCase()
-                        .includes(searchTerm);
+                    company.includes(searchTerm) ||
+                    role.includes(searchTerm) ||
+                    location.includes(searchTerm);
 
                 const matchesStatus =
                     selectedStatus === "All" ||
                     selectedStatus === "all" ||
                     application.status === selectedStatus;
 
-                return (
-                    matchesSearch &&
-                    matchesStatus
-                );
-            }
-        );
+                return matchesSearch && matchesStatus;
+            });
 
-
-    filteredApplications.forEach(
-        application => {
-
-            const card =
-                document.createElement("div");
-
-            card.className =
-                "application-card";
-
+        filteredApplications.forEach((application) => {
+            const card = document.createElement("div");
+            card.className = "application-card";
             card.draggable = true;
+            card.dataset.id = String(
+                application.id
+            );
 
-            card.dataset.id =
-                application.id;
-
-            const statusClass =
-                application.status
-                    .toLowerCase()
-                    .replace(/\s+/g, "-");
+            const statusClass = String(
+                application.status || ""
+            )
+                .toLowerCase()
+                .replace(/\s+/g, "-");
 
             card.innerHTML = `
                 <div class="application-card-header">
-
-                    <h3>
-                        ${application.company}
-                    </h3>
-
+                    <h3>${escapeHTML(application.company || "")}</h3>
                     <span class="application-status status-${statusClass}">
-                        ${application.status}
+                        ${escapeHTML(application.status || "")}
                     </span>
-
                 </div>
 
-                <p class="application-role">
-                    ${application.role}
-                </p>
+                <p class="application-role">${escapeHTML(
+                    application.role || ""
+                )}</p>
 
                 ${
                     application.location
-                        ? `
-                            <p class="application-location">
-                                📍 ${application.location}
-                            </p>
-                        `
+                        ? `<p class="application-location">📍 ${escapeHTML(
+                              application.location
+                          )}</p>`
                         : ""
                 }
 
                 ${
                     application.applicationDate
-                        ? `
-                            <p class="application-date">
-                                📅 ${application.applicationDate}
-                            </p>
-                        `
+                        ? `<p class="application-date">📅 ${escapeHTML(
+                              application.applicationDate
+                          )}</p>`
                         : ""
                 }
 
                 ${
                     application.salary
-                        ? `
-                            <p class="application-salary">
-                                💰 ${application.salary}
-                            </p>
-                        `
+                        ? `<p class="application-salary">💰 ${escapeHTML(
+                              application.salary
+                          )}</p>`
                         : ""
                 }
 
                 ${
                     application.closingDate
                         ? (() => {
+                              const closingStatus =
+                                  getClosingDateStatus(
+                                      application.closingDate
+                                  );
 
-                            const closingStatus =
-                                getClosingDateStatus(
-                                    application.closingDate
-                                );
-
-                            return `
-                                <div class="application-closing ${closingStatus.className}">
-
-                                    <strong>
-                                        ${closingStatus.label}
-                                    </strong>
-
-                                    <span>
-                                        Deadline: ${application.closingDate}
-                                    </span>
-
-                                </div>
-                            `;
-                        })()
+                              return `
+                                  <div class="application-closing ${closingStatus.className}">
+                                      <strong>${escapeHTML(
+                                          closingStatus.label
+                                      )}</strong>
+                                      <span>Deadline: ${escapeHTML(
+                                          application.closingDate
+                                      )}</span>
+                                  </div>
+                              `;
+                          })()
                         : ""
                 }
 
                 ${
                     application.jobUrl
-                        ? `
-                            <p class="application-url">
-
-                                🔗
-
-                                <a
-                                    href="${application.jobUrl}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    View Job Posting
-                                </a>
-
-                            </p>
-                        `
+                        ? `<p class="application-url">🔗 <a href="${escapeHTML(
+                              application.jobUrl
+                          )}" target="_blank" rel="noopener noreferrer">View Job Posting</a></p>`
                         : ""
                 }
 
                 ${
                     application.notes
-                        ? `
-                            <p class="application-notes">
-                                📝 ${application.notes}
-                            </p>
-                        `
+                        ? `<p class="application-notes">📝 ${escapeHTML(
+                              application.notes
+                          )}</p>`
                         : ""
                 }
 
                 <div class="application-actions">
-
-                    <button
-                        class="edit-btn"
-                        data-id="${application.id}"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        class="delete-btn"
-                        data-id="${application.id}"
-                    >
-                        Delete
-                    </button>
-
+                    <button class="edit-btn" data-id="${application.id}">Edit</button>
+                    <button class="delete-btn" data-id="${application.id}">Delete</button>
                 </div>
             `;
 
-
-            /* Drag start */
-
             card.addEventListener(
                 "dragstart",
-                event => {
-
-                    card.classList.add(
-                        "dragging"
-                    );
+                (event) => {
+                    card.classList.add("dragging");
 
                     event.dataTransfer.setData(
                         "text/plain",
-                        application.id
+                        String(application.id)
                     );
 
                     event.dataTransfer.effectAllowed =
@@ -1053,1417 +1357,2345 @@ function renderApplications() {
                 }
             );
 
-
-            /* Drag end */
-
             card.addEventListener(
                 "dragend",
                 () => {
+                    card.classList.remove("dragging");
+                }
+            );
 
-                    card.classList.remove(
-                        "dragging"
+            const targetColumn = [...kanbanColumns].find(
+                (column) => {
+                    const columnTitle =
+                        column.querySelector(
+                            ".column-header span"
+                        );
+
+                    return (
+                        columnTitle &&
+                        columnTitle.textContent.trim() ===
+                            application.status
                     );
                 }
             );
 
-
-            const targetColumn =
-                [...kanbanColumns].find(
-                    column => {
-
-                        const columnTitle =
-                            column.querySelector(
-                                ".column-header span"
-                            );
-
-                        return (
-                            columnTitle &&
-                            columnTitle.textContent
-                                .trim() ===
-                            application.status
-                        );
-                    }
-                );
-
-
             if (targetColumn) {
-
                 const applicationList =
                     targetColumn.querySelector(
                         ".application-list"
                     );
 
                 if (applicationList) {
-
-                    applicationList.appendChild(
-                        card
-                    );
+                    applicationList.appendChild(card);
                 }
             }
-        }
-    );
+        });
 
-    updateColumnCounts();
-}
+        updateColumnCounts();
+    }
 
+    function updateColumnCounts() {
+        if (!kanbanColumns || !kanbanColumns.length)
+            return;
 
-/* =========================================================
-   UPDATE KANBAN COUNTERS
-   ========================================================= */
-
-function updateColumnCounts() {
-
-    kanbanColumns.forEach(
-        column => {
-
+        kanbanColumns.forEach((column) => {
             const columnTitle =
                 column.querySelector(
                     ".column-header span"
                 );
 
             const count =
-                column.querySelector(
-                    ".column-count"
-                );
+                column.querySelector(".column-count");
 
-            if (!columnTitle || !count) {
-                return;
-            }
+            if (!columnTitle || !count) return;
 
             const status =
                 columnTitle.textContent.trim();
 
-            const number =
-                applications.filter(
-                    application =>
-                        application.status === status
-                ).length;
+            const number = applications.filter(
+                (application) =>
+                    application.status === status
+            ).length;
 
-            count.textContent =
-                number;
-        }
-    );
-}
+            count.textContent = String(number);
+        });
+    }
 
-
-/* =========================================================
-   DRAG AND DROP
-   ========================================================= */
-
-document
-    .querySelectorAll(".kanban-column")
-    .forEach(
-        column => {
-
+    document
+        .querySelectorAll(".kanban-column")
+        .forEach((column) => {
             column.addEventListener(
                 "dragover",
-                event => {
-
+                (event) => {
                     event.preventDefault();
 
-                    event.dataTransfer.dropEffect =
-                        "move";
+                    if (event.dataTransfer) {
+                        event.dataTransfer.dropEffect =
+                            "move";
+                    }
                 }
             );
 
-
             column.addEventListener(
                 "drop",
-                event => {
-
+                (event) => {
                     event.preventDefault();
 
-                    const id =
-                        Number(
-                            event.dataTransfer.getData(
-                                "text/plain"
-                            )
-                        );
+                    const id = Number(
+                        event.dataTransfer.getData(
+                            "text/plain"
+                        )
+                    );
 
                     const application =
                         applications.find(
-                            app =>
-                                app.id === id
+                            (app) => app.id === id
                         );
 
-                    if (!application) {
-                        return;
-                    }
+                    if (!application) return;
 
                     const columnTitle =
                         column.querySelector(
                             ".column-header span"
                         );
 
-                    if (!columnTitle) {
-                        return;
-                    }
+                    if (!columnTitle) return;
 
                     const newStatus =
                         columnTitle.textContent.trim();
 
-                    application.status =
-                        newStatus;
+                    application.status = newStatus;
 
                     saveApplications();
-
                     renderApplications();
-
                     updateStatistics();
-
                     updateColumnCounts();
-
                     renderApplicationsPage();
-
                     updateAIInbox();
-
                     updateUpcomingInterviews();
-
                     renderInterviewsPage();
-
                     renderAnalyticsPage();
                 }
             );
+        });
+
+    function buildJobRecommendationHTML(message) {
+        const matchedApplication =
+            message?.matchedApplication;
+
+        if (!matchedApplication) {
+            return "";
         }
-    );
 
-
-/* =========================================================
-   AI INBOX
-   ========================================================= */
-
-function updateAIInbox() {
-
-    const aiInbox =
-        document.querySelector("#ai-inbox");
-
-    if (!aiInbox) {
-        return;
-    }
-
-    if (applications.length === 0) {
-
-        aiInbox.innerHTML = `
-            <p>
-                No applications to analyse yet.
-            </p>
+        return `
+            <div class="ai-match">
+                <span>Possible match</span>
+                <strong>${escapeHTML(
+                    matchedApplication.company
+                )}</strong>
+                <small>${escapeHTML(
+                    matchedApplication.role
+                )}</small>
+            </div>
         `;
-
-        return;
     }
 
+    const cvFileInput =
+        document.querySelector("#cv-file");
 
-    const recommendations =
-        applications.map(
-            application => {
+    const cvStatus =
+        document.querySelector("#cv-status");
 
-                let message = "";
+    const removeCVButton =
+        document.querySelector("#remove-cv");
 
+    const buildCVButton =
+        document.querySelector("#build-cv-with-ai");
 
-                switch (application.status) {
+    const CV_DATABASE_NAME =
+        "jobtselaCVDatabase";
 
-                    case "Applied":
+    const CV_STORE_NAME =
+        "cvFiles";
 
-                        message =
-                            "Consider following up if you have not received a response.";
+    const CV_RECORD_ID =
+        "primary";
 
-                        break;
+    const CV_DATABASE_VERSION =
+        3;
 
+    const MAX_CV_SIZE =
+        5 * 1024 * 1024;
 
-                    case "Assessment":
+    function readFileAsArrayBuffer(file) {
+        return new Promise((resolve, reject) => {
+            const completeRead = (reader) => {
+                reader.onload = () => {
+                    if (
+                        reader.result instanceof ArrayBuffer
+                    ) {
+                        resolve(reader.result);
+                        return;
+                    }
 
-                        message =
-                            "Assessment stage. Complete any required tests and prepare for the next step.";
+                    reject(
+                        new Error(
+                            "The CV could not be read as binary data."
+                        )
+                    );
+                };
 
-                        break;
+                reader.onerror = () => {
+                    reject(
+                        reader.error ||
+                            new Error(
+                                "The CV could not be read."
+                            )
+                    );
+                };
 
+                reader.onabort = () => {
+                    reject(
+                        new Error(
+                            "CV file reading was cancelled."
+                        )
+                    );
+                };
+            };
 
-                    case "Interview":
+            const reader =
+                new FileReader();
 
-                        message =
-                            "Interview stage. Prepare questions, research the company, and review the role.";
+            completeRead(reader);
 
-                        break;
+            try {
+                reader.readAsArrayBuffer(file);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
 
+    function openCVDatabase() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(
+                CV_DATABASE_NAME,
+                CV_DATABASE_VERSION
+            );
 
-                    case "Offer":
+            request.onupgradeneeded = () => {
+                const database =
+                    request.result;
 
-                        message =
-                            "Offer received. Review the salary, benefits, conditions, and next steps.";
-
-                        break;
-
-
-                    case "Rejected":
-
-                        message =
-                            "Application closed. Consider similar opportunities and continue applying.";
-
-                        break;
-
-
-                    default:
-
-                        message =
-                            "Review this application and update its status when needed.";
+                if (
+                    database.objectStoreNames.contains(
+                        CV_STORE_NAME
+                    )
+                ) {
+                    database.deleteObjectStore(
+                        CV_STORE_NAME
+                    );
                 }
 
+                database.createObjectStore(
+                    CV_STORE_NAME,
+                    {
+                        keyPath: "id"
+                    }
+                );
+            };
 
-                return `
-                    <div class="ai-recommendation">
+            request.onsuccess = () => {
+                const database =
+                    request.result;
 
-                        <strong>
-                            ${application.company}
-                        </strong>
+                database.onversionchange = () => {
+                    database.close();
+                };
 
-                        <span>
-                            ${application.status}
-                        </span>
+                resolve(database);
+            };
 
-                        <p>
-                            ${message}
-                        </p>
+            request.onerror = () => {
+                reject(request.error);
+            };
 
-                    </div>
-                `;
+            request.onblocked = () => {
+                reject(
+                    new Error(
+                        "The CV database is being used by another JobTsela tab. Close the other JobTsela tab and try again."
+                    )
+                );
+            };
+        });
+    }
+
+    async function saveCVFile(
+        file,
+        extractedText,
+        fileData,
+        extractionStatus = "ready"
+    ) {
+        const database =
+            await openCVDatabase();
+
+        return new Promise(
+            (resolve, reject) => {
+                const transaction =
+                    database.transaction(
+                        CV_STORE_NAME,
+                        "readwrite"
+                    );
+
+                const store =
+                    transaction.objectStore(
+                        CV_STORE_NAME
+                    );
+
+                store.put({
+                    id: CV_RECORD_ID,
+
+                    name: file.name,
+
+                    type:
+                        file.type ||
+                        (
+                            file.name
+                                .toLowerCase()
+                                .endsWith(".pdf")
+                                ? "application/pdf"
+                                : "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        ),
+
+                    size: file.size,
+
+                    lastModified:
+                        file.lastModified,
+
+                    extractedText:
+                        String(
+                            extractedText || ""
+                        ),
+
+                    extractionStatus,
+
+                    fileData
+                });
+
+                transaction.oncomplete = () => {
+                    database.close();
+                    resolve();
+                };
+
+                transaction.onerror = () => {
+                    const error =
+                        transaction.error;
+
+                    database.close();
+
+                    if (
+                        error?.name ===
+                        "QuotaExceededError"
+                    ) {
+                        reject(
+                            new Error(
+                                "There is not enough browser storage available to save this CV."
+                            )
+                        );
+                        return;
+                    }
+
+                    reject(
+                        error ||
+                            new Error(
+                                "The CV could not be saved."
+                            )
+                    );
+                };
+
+                transaction.onabort = () => {
+                    const error =
+                        transaction.error;
+
+                    database.close();
+
+                    reject(
+                        error ||
+                            new Error(
+                                "The CV storage operation was aborted."
+                            )
+                    );
+                };
+            }
+        );
+    }
+
+    async function extractPDFText(fileData) {
+        const pdfjsLib =
+            await import(
+                "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.mjs"
+            );
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.worker.mjs";
+
+        const pdfBytes =
+            new Uint8Array(
+                fileData.slice(0)
+            );
+
+        const loadingTask =
+            pdfjsLib.getDocument({
+                data: pdfBytes
+            });
+
+        const pdf =
+            await loadingTask.promise;
+
+        try {
+            const pages = [];
+
+            for (
+                let pageNumber = 1;
+                pageNumber <= pdf.numPages;
+                pageNumber++
+            ) {
+                const page =
+                    await pdf.getPage(
+                        pageNumber
+                    );
+
+                const content =
+                    await page.getTextContent();
+
+                const pageText =
+                    content.items
+                        .map((item) => {
+                            return typeof item.str ===
+                                "string"
+                                ? item.str
+                                : "";
+                        })
+                        .join(" ")
+                        .replace(/\s+/g, " ")
+                        .trim();
+
+                if (pageText) {
+                    pages.push(pageText);
+                }
+
+                page.cleanup();
+            }
+
+            const extractedText =
+                pages.join("\n\n").trim();
+
+            if (!extractedText) {
+                const error = new Error(
+                    "This PDF appears to be scanned or image-based."
+                );
+
+                error.code =
+                    "SCANNED_PDF";
+
+                throw error;
+            }
+
+            return extractedText;
+                } finally {
+
+            if (
+                pdf &&
+                typeof pdf.destroy ===
+                    "function"
+            ) {
+                await pdf.destroy();
+            }
+
+        }
+    }
+
+    async function extractDOCXText(
+        fileData
+    ) {
+        if (!window.mammoth) {
+            const error = new Error(
+                "DOCX reader is unavailable."
+            );
+
+            error.code =
+                "DOCX_READER_UNAVAILABLE";
+
+            throw error;
+        }
+
+        const docxData =
+            fileData.slice(0);
+
+        const result =
+            await window.mammoth.extractRawText(
+                {
+                    arrayBuffer: docxData
+                }
+            );
+
+        if (result.messages?.length) {
+            console.warn(
+                "Mammoth DOCX extraction warnings:",
+                result.messages
+            );
+        }
+
+        const extractedText =
+            String(result.value || "")
+                .replace(/\s+/g, " ")
+                .trim();
+
+        if (!extractedText) {
+            const error = new Error(
+                "This DOCX does not contain readable text."
+            );
+
+            error.code =
+                "EMPTY_DOCX";
+
+            throw error;
+        }
+
+        return extractedText;
+    }
+
+    async function extractCVText(
+        fileData,
+        fileName
+    ) {
+        const lowerName =
+            String(
+                fileName || ""
+            ).toLowerCase();
+
+        if (
+            lowerName.endsWith(".pdf")
+        ) {
+            return extractPDFText(
+                fileData
+            );
+        }
+
+        if (
+            lowerName.endsWith(".docx")
+        ) {
+            return extractDOCXText(
+                fileData
+            );
+        }
+
+        const error = new Error(
+            "Unsupported CV format."
+        );
+
+        error.code =
+            "UNSUPPORTED_CV_FORMAT";
+
+        throw error;
+    }
+
+    async function getStoredCV() {
+        const database =
+            await openCVDatabase();
+
+        return new Promise(
+            (resolve, reject) => {
+                const transaction =
+                    database.transaction(
+                        CV_STORE_NAME,
+                        "readonly"
+                    );
+
+                const store =
+                    transaction.objectStore(
+                        CV_STORE_NAME
+                    );
+
+                const request =
+                    store.get(
+                        CV_RECORD_ID
+                    );
+
+                request.onsuccess = () => {
+                    database.close();
+
+                    resolve(
+                        request.result ||
+                            null
+                    );
+                };
+
+                request.onerror = () => {
+                    database.close();
+
+                    reject(
+                        request.error
+                    );
+                };
+            }
+        );
+    }
+
+    async function deleteStoredCV() {
+        const database =
+            await openCVDatabase();
+
+        return new Promise(
+            (resolve, reject) => {
+                const transaction =
+                    database.transaction(
+                        CV_STORE_NAME,
+                        "readwrite"
+                    );
+
+                const store =
+                    transaction.objectStore(
+                        CV_STORE_NAME
+                    );
+
+                store.delete(
+                    CV_RECORD_ID
+                );
+
+                transaction.oncomplete =
+                    () => {
+                        database.close();
+                        resolve();
+                    };
+
+                transaction.onerror = () => {
+                    const error =
+                        transaction.error;
+
+                    database.close();
+
+                    reject(
+                        error ||
+                            new Error(
+                                "The CV could not be removed."
+                            )
+                    );
+                };
+
+                transaction.onabort = () => {
+                    const error =
+                        transaction.error;
+
+                    database.close();
+
+                    reject(
+                        error ||
+                            new Error(
+                                "CV removal was aborted."
+                            )
+                    );
+                };
+            }
+        );
+    }
+
+    function formatFileSize(bytes) {
+        if (
+            bytes <
+            1024 * 1024
+        ) {
+            return `${Math.round(
+                bytes / 1024
+            )} KB`;
+        }
+
+        return `${(
+            bytes /
+            (1024 * 1024)
+        ).toFixed(1)} MB`;
+    }
+
+    function renderCVStatus(cv) {
+        if (!cv) {
+            if (cvStatus) {
+                cvStatus.textContent =
+                    "No CV uploaded yet.";
+            }
+
+            if (removeCVButton) {
+                removeCVButton.disabled =
+                    true;
+            }
+
+            if (buildCVButton) {
+                buildCVButton.disabled =
+                    true;
+            }
+
+            return;
+        }
+
+        const hasExtractedText =
+            typeof cv.extractedText ===
+                "string" &&
+            cv.extractedText
+                .trim()
+                .length > 0;
+
+        if (cvStatus) {
+            if (hasExtractedText) {
+                cvStatus.textContent =
+                    `CV uploaded: ${cv.name} · ${formatFileSize(
+                        cv.size
+                    )} · Saved on this device`;
+            } else if (
+                cv.extractionStatus ===
+                "scanned"
+            ) {
+                cvStatus.textContent =
+                    `CV uploaded: ${cv.name} · ${formatFileSize(
+                        cv.size
+                    )} · Scanned PDF — OCR needed`;
+            } else {
+                cvStatus.textContent =
+                    `CV uploaded: ${cv.name} · ${formatFileSize(
+                        cv.size
+                    )} · Text extraction pending`;
+            }
+        }
+
+        if (removeCVButton) {
+            removeCVButton.disabled =
+                false;
+        }
+
+        if (buildCVButton) {
+            buildCVButton.disabled =
+                !hasExtractedText;
+        }
+    }
+
+    async function handleCVUpload(file) {
+        if (!file) return;
+
+        const lowerName =
+            String(
+                file.name || ""
+            ).toLowerCase();
+
+        const isPDF =
+            lowerName.endsWith(
+                ".pdf"
+            ) ||
+            file.type ===
+                "application/pdf";
+
+        const isDOCX =
+            lowerName.endsWith(
+                ".docx"
+            ) ||
+            file.type ===
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+        if (
+            !isPDF &&
+            !isDOCX
+        ) {
+            if (cvStatus) {
+                cvStatus.textContent =
+                    "Invalid file. Please upload a PDF or DOCX CV.";
+            }
+
+            if (cvFileInput) {
+                cvFileInput.value =
+                    "";
+            }
+
+            return;
+        }
+
+        if (file.size === 0) {
+            if (cvStatus) {
+                cvStatus.textContent =
+                    "This file is empty. Please select a valid CV.";
+            }
+
+            if (cvFileInput) {
+                cvFileInput.value =
+                    "";
+            }
+
+            return;
+        }
+
+        if (
+            file.size >
+            MAX_CV_SIZE
+        ) {
+            if (cvStatus) {
+                cvStatus.textContent =
+                    "CV is too large. Maximum size is 5 MB.";
+            }
+
+            if (cvFileInput) {
+                cvFileInput.value =
+                    "";
+            }
+
+            return;
+        }
+
+        if (cvStatus) {
+            cvStatus.textContent =
+                "Uploading your CV...";
+        }
+
+        if (buildCVButton) {
+            buildCVButton.disabled =
+                true;
+        }
+
+        try {
+            const fileData =
+                await readFileAsArrayBuffer(
+                    file
+                );
+
+            let extractedText =
+                "";
+
+            let extractionStatus =
+                "ready";
+
+            try {
+                extractedText =
+                    await extractCVText(
+                        fileData,
+                        file.name
+                    );
+                        } catch (error) {
+                console.error(
+                    "CV TEXT EXTRACTION FAILED:",
+                    error
+                );
+
+                console.error(
+                    "Extraction error name:",
+                    error?.name
+                );
+
+                console.error(
+                    "Extraction error message:",
+                    error?.message
+                );
+
+                console.error(
+                    "Extraction error code:",
+                    error?.code
+                );
+
+                if (
+                    error?.code ===
+                    "SCANNED_PDF"
+                ) {
+                    extractionStatus =
+                        "scanned";
+                } else {
+                    extractionStatus =
+                        "pending";
+                }
+            }
+
+            await saveCVFile(
+                file,
+                extractedText,
+                fileData,
+                extractionStatus
+            );
+
+            const storedCV =
+                await getStoredCV();
+
+            renderCVStatus(
+                storedCV
+            );
+
+            if (
+                cvStatus &&
+                extractionStatus ===
+                    "scanned"
+            ) {
+                cvStatus.textContent =
+                    `CV uploaded: ${file.name} · ${formatFileSize(
+                        file.size
+                    )} · Scanned PDF — OCR needed`;
+            } else if (
+                cvStatus &&
+                extractionStatus ===
+                    "pending"
+            ) {
+                cvStatus.textContent =
+                    `CV uploaded: ${file.name} · ${formatFileSize(
+                        file.size
+                    )} · Text extraction pending`;
+            }
+        } catch (error) {
+            console.error(
+                "Could not upload CV:",
+                error
+            );
+
+            if (cvStatus) {
+                if (
+                    error?.name ===
+                        "NotReadableError" ||
+                    error?.code ===
+                        "CV_FILE_NOT_READABLE"
+                ) {
+                    cvStatus.textContent =
+                        "The CV could not be read. Close the file, make sure it is available locally, and select it again.";
+                } else if (
+                    error?.name ===
+                    "QuotaExceededError"
+                ) {
+                    cvStatus.textContent =
+                        "There is not enough browser storage available to save this CV.";
+                } else {
+                    cvStatus.textContent =
+                        `Could not upload this CV: ${
+                            error.message ||
+                            "Unknown error"
+                        }`;
+                }
+            }
+
+            if (cvFileInput) {
+                cvFileInput.value =
+                    "";
+            }
+
+            if (buildCVButton) {
+                buildCVButton.disabled =
+                    true;
+            }
+        }
+    }
+
+    if (cvFileInput) {
+        cvFileInput.addEventListener(
+            "change",
+            () => {
+                const file =
+                    cvFileInput.files?.[0];
+
+                handleCVUpload(file);
+            }
+        );
+    }
+
+    if (removeCVButton) {
+        removeCVButton.addEventListener(
+            "click",
+            async () => {
+                try {
+                    await deleteStoredCV();
+
+                    if (cvFileInput) {
+                        cvFileInput.value =
+                            "";
+                    }
+
+                    renderCVStatus(
+                        null
+                    );
+                } catch (error) {
+                    console.error(
+                        "Could not remove CV:",
+                        error
+                    );
+
+                    if (cvStatus) {
+                        cvStatus.textContent =
+                            "Could not remove the saved CV. Please try again.";
+                    }
+                }
+            }
+        );
+    }
+
+    if (buildCVButton) {
+        buildCVButton.addEventListener(
+            "click",
+            () => {
+                alert(
+                    "Your CV is ready for the AI CV Builder. The AI processing layer will be connected next."
+                );
+            }
+        );
+    }
+
+    async function initializeCVProfile() {
+        try {
+            const storedCV =
+                await getStoredCV();
+
+            renderCVStatus(
+                storedCV
+            );
+        } catch (error) {
+            console.error(
+                "Could not load stored CV:",
+                error
+            );
+        }
+    }
+
+    function updateAIInbox() {
+        const aiContent =
+            document.querySelector(
+                "#ai-content"
+            );
+
+        if (!aiContent) return;
+
+        const categoryLabels = {
+            INTERVIEW:
+                "Interview Detected",
+            ASSESSMENT:
+                "Assessment Detected",
+            OFFER:
+                "Offer Detected",
+            REJECTION:
+                "Application Update",
+            APPLICATION:
+                "Application Received",
+            RECRUITER:
+                "Recruiter Activity",
+            RECRUITMENT:
+                "Career Opportunities",
+            OTHER:
+                "Other Gmail"
+        };
+
+        const categoryOrder = [
+            "INTERVIEW",
+            "ASSESSMENT",
+            "OFFER",
+            "REJECTION",
+            "APPLICATION",
+            "RECRUITER",
+            "RECRUITMENT",
+            "OTHER"
+        ];
+
+        const gmailMessages =
+            (
+                window.analysedGmailMessages ||
+                []
+            ).filter(
+                (message) =>
+                    message.category !==
+                    "NOISE"
+            );
+
+        const groupedMessages =
+            {};
+
+        categoryOrder.forEach(
+            (category) => {
+                groupedMessages[
+                    category
+                ] = [];
             }
         );
 
+        gmailMessages.forEach(
+            (message) => {
+                const category =
+                    categoryOrder.includes(
+                        message.category
+                    )
+                        ? message.category
+                        : "OTHER";
 
-    aiInbox.innerHTML =
-        recommendations.join("");
-}
-
-
-/* =========================================================
-   APPLICATION MODAL
-   ========================================================= */
-
-const modal =
-    document.querySelector(
-        "#application-modal"
-    );
-
-const openModalButton =
-    document.querySelector(
-        "#open-modal"
-    );
-
-const closeModalButton =
-    document.querySelector(
-        "#close-modal"
-    );
-
-const cancelModalButton =
-    document.querySelector(
-        "#cancel-modal"
-    );
-
-const applicationForm =
-    document.querySelector(
-        "#application-form"
-    );
-
-const hasApplicationModal =
-    modal &&
-    openModalButton &&
-    closeModalButton &&
-    cancelModalButton &&
-    applicationForm;
-
-
-/* =========================================================
-   OPEN MODAL
-   ========================================================= */
-
-if (hasApplicationModal) {
-
-    openModalButton.addEventListener(
-        "click",
-        () => {
-
-            applicationForm.reset();
-
-            editingApplicationId =
-                null;
-
-            const modalTitle =
-                document.querySelector(
-                    ".modal-header h2"
-                );
-
-            const submitButton =
-                document.querySelector(
-                    "#submit-application"
-                );
-
-            if (modalTitle) {
-                modalTitle.textContent =
-                    "Add Job Application";
+                groupedMessages[
+                    category
+                ].push(message);
             }
+        );
 
-            if (submitButton) {
-                submitButton.textContent =
-                    "Add Application";
+        const gmailSections = [];
+
+        categoryOrder.forEach(
+            (category) => {
+                const messages =
+                    groupedMessages[
+                        category
+                    ];
+
+                if (
+                    messages.length === 0
+                )
+                    return;
+
+                const cards =
+                    messages
+                        .sort(
+                            (a, b) => {
+                                const dateA =
+                                    new Date(
+                                        a.date || 0
+                                    );
+
+                                const dateB =
+                                    new Date(
+                                        b.date || 0
+                                    );
+
+                                return (
+                                    dateB -
+                                    dateA
+                                );
+                            }
+                        )
+                        .map(
+                            (
+                                message
+                            ) => {
+                                const categoryClass =
+                                    String(
+                                        message.category ||
+                                            ""
+                                    )
+                                        .toLowerCase()
+                                        .replace(
+                                            /\s+/g,
+                                            "-"
+                                        );
+
+                                const matchHTML =
+                                    buildJobRecommendationHTML(
+                                        message
+                                    );
+
+                                const bodyPreview =
+                                    String(
+                                        message.body ||
+                                            ""
+                                    )
+                                        .replace(
+                                            /\s+/g,
+                                            " "
+                                        )
+                                        .trim()
+                                        .slice(
+                                            0,
+                                            160
+                                        );
+
+                                const previewHTML =
+                                    bodyPreview
+                                        ? `<p>${escapeHTML(
+                                              bodyPreview
+                                          )}${
+                                              String(
+                                                  message.body ||
+                                                      ""
+                                              )
+                                                  .length >
+                                              160
+                                                  ? "..."
+                                                  : ""
+                                          }</p>`
+                                        : "";
+
+                                return `
+                        <div class="ai-recommendation gmail-recommendation ${categoryClass}">
+                            <div class="ai-card-main">
+                                <strong>${escapeHTML(
+                                    message.subject ||
+                                        "(No subject)"
+                                )}</strong>
+                                <small>${escapeHTML(
+                                    message.sender ||
+                                        "Unknown sender"
+                                )}</small>
+                                ${previewHTML}
+                            </div>
+
+                            <span class="ai-category-badge">
+                                ${escapeHTML(
+                                    categoryLabels[
+                                        category
+                                    ]
+                                )}
+                            </span>
+
+                            ${matchHTML}
+                        </div>
+                    `;
+                            }
+                        )
+                        .join("");
+
+                gmailSections.push(
+                    `
+                <section class="ai-category-section" data-category="${escapeHTML(
+                    category
+                )}">
+                    <div class="ai-category-header">
+                        <h3>${escapeHTML(
+                            categoryLabels[
+                                category
+                            ]
+                        )}</h3>
+                        <span>${messages.length}</span>
+                    </div>
+
+                    <div class="ai-category-messages">
+                        ${cards}
+                    </div>
+                </section>
+            `
+                );
             }
+        );
 
-            modal.classList.add(
-                "active"
-            );
+        const applicationRecommendations =
+            applications
+                .filter(
+                    (application) =>
+                        application.status !==
+                        "Offer"
+                )
+                .map(
+                    (application) => {
+                        return `
+                    <div class="ai-recommendation application-recommendation">
+                        <div class="ai-card-main">
+                            <strong>${escapeHTML(
+                                application.company
+                            )}</strong>
+                            <small>${escapeHTML(
+                                application.role
+                            )}</small>
+                        </div>
+
+                        <span class="ai-category-badge">
+                            ${escapeHTML(
+                                application.status
+                            )}
+                        </span>
+                    </div>
+                `;
+                    }
+                )
+                .join("");
+
+        const applicationSection =
+            applicationRecommendations
+                ? `
+                <section class="ai-category-section" data-category="APPLICATION-PIPELINE">
+                    <div class="ai-category-header">
+                        <h3>Application Pipeline</h3>
+                        <span>${applications.filter(
+                            (application) =>
+                                application.status !==
+                                "Offer"
+                        ).length}</span>
+                    </div>
+
+                    <div class="ai-category-messages">
+                        ${applicationRecommendations}
+                    </div>
+                </section>
+            `
+                : "";
+
+        if (
+            gmailSections.length === 0 &&
+            !applicationSection
+        ) {
+            aiContent.innerHTML = `
+                <div class="ai-empty">
+                    <h3>No recruitment alerts right now.</h3>
+                    <p>JobTsela will continue monitoring your application pipeline and Gmail.</p>
+                </div>
+            `;
+
+            return;
         }
-    );
-}
 
+        aiContent.innerHTML = `
+            ${gmailSections.join("")}
+            ${applicationSection}
+        `;
+    }
 
-/* =========================================================
-   CLOSE MODAL
-   ========================================================= */
+    const modal =
+        document.querySelector(
+            "#dashboard-application-modal"
+        );
 
-if (hasApplicationModal) {
+    const openModalButton =
+        document.querySelector(
+            "#dashboard-open-modal"
+        );
 
-    closeModalButton.addEventListener(
-        "click",
-        () => {
+    const closeModalButton =
+        document.querySelector(
+            "#dashboard-close-modal"
+        );
 
-            modal.classList.remove(
-                "active"
-            );
-        }
-    );
-}
+    const cancelModalButton =
+        document.querySelector(
+            "#dashboard-cancel-modal"
+        );
 
+    const applicationForm =
+        document.querySelector(
+            "#dashboard-application-form"
+        );
 
-/* =========================================================
-   CANCEL FORM
-   ========================================================= */
+    const hasApplicationModal =
+        !!(
+            modal &&
+            openModalButton &&
+            closeModalButton &&
+            cancelModalButton &&
+            applicationForm
+        );
 
-if (hasApplicationModal) {
+    if (hasApplicationModal) {
+        openModalButton.addEventListener(
+            "click",
+            () => {
+                applicationForm.reset();
+                editingApplicationId =
+                    null;
 
-    cancelModalButton.addEventListener(
-        "click",
-        () => {
+                const modalTitle =
+                    document.querySelector(
+                        ".modal-header h2"
+                    );
 
-            modal.classList.remove(
-                "active"
-            );
-        }
-    );
-}
+                const submitButton =
+                    document.querySelector(
+                        "#dashboard-submit-application"
+                    );
 
+                if (modalTitle) {
+                    modalTitle.textContent =
+                        "Add Job Application";
+                }
 
-/* =========================================================
-   CLOSE MODAL OUTSIDE
-   ========================================================= */
+                if (submitButton) {
+                    submitButton.textContent =
+                        "Add Application";
+                }
 
-if (hasApplicationModal) {
+                modal.classList.add(
+                    "active"
+                );
+            }
+        );
 
-    modal.addEventListener(
-        "click",
-        event => {
+        closeModalButton.addEventListener(
+            "click",
+            () => {
+                modal.classList.remove(
+                    "active"
+                );
+            }
+        );
 
-            if (event.target === modal) {
+        cancelModalButton.addEventListener(
+            "click",
+            () => {
+                modal.classList.remove(
+                    "active"
+                );
+            }
+        );
+
+        modal.addEventListener(
+            "click",
+            (event) => {
+                if (
+                    event.target === modal
+                ) {
+                    modal.classList.remove(
+                        "active"
+                    );
+                }
+            }
+        );
+
+        applicationForm.addEventListener(
+            "submit",
+            (event) => {
+                event.preventDefault();
+
+                const companyField =
+                    document.querySelector(
+                        "#company"
+                    );
+
+                const roleField =
+                    document.querySelector(
+                        "#role"
+                    );
+
+                const locationField =
+                    document.querySelector(
+                        "#location"
+                    );
+
+                const statusField =
+                    document.querySelector(
+                        "#status"
+                    );
+
+                const applicationDateField =
+                    document.querySelector(
+                        "#application-date"
+                    );
+
+                const interviewDateField =
+                    document.querySelector(
+                        "#interview-date"
+                    );
+
+                const interviewTimeField =
+                    document.querySelector(
+                        "#interview-time"
+                    );
+
+                const salaryField =
+                    document.querySelector(
+                        "#salary"
+                    );
+
+                const closingDateField =
+                    document.querySelector(
+                        "#closing-date"
+                    );
+
+                const jobUrlField =
+                    document.querySelector(
+                        "#job-url"
+                    );
+
+                const notesField =
+                    document.querySelector(
+                        "#notes"
+                    );
+
+                if (
+                    !companyField ||
+                    !roleField ||
+                    !statusField
+                ) {
+                    console.error(
+                        "Required application fields are missing."
+                    );
+                    return;
+                }
+
+                const company =
+                    companyField.value.trim();
+
+                const role =
+                    roleField.value.trim();
+
+                const location =
+                    locationField
+                        ? locationField.value.trim()
+                        : "";
+
+                const status =
+                    statusField.value;
+
+                const applicationDate =
+                    applicationDateField
+                        ? applicationDateField.value
+                        : "";
+
+                const interviewDate =
+                    interviewDateField
+                        ? interviewDateField.value
+                        : "";
+
+                const interviewTime =
+                    interviewTimeField
+                        ? interviewTimeField.value
+                        : "";
+
+                const salary =
+                    salaryField
+                        ? salaryField.value.trim()
+                        : "";
+
+                const closingDate =
+                    closingDateField
+                        ? closingDateField.value
+                        : "";
+
+                const jobUrl =
+                    jobUrlField
+                        ? jobUrlField.value.trim()
+                        : "";
+
+                const notes =
+                    notesField
+                        ? notesField.value.trim()
+                        : "";
+
+                if (
+                    editingApplicationId !==
+                    null
+                ) {
+                    const application =
+                        applications.find(
+                            (item) =>
+                                item.id ===
+                                editingApplicationId
+                        );
+
+                    if (application) {
+                        application.company =
+                            company;
+
+                        application.role =
+                            role;
+
+                        application.location =
+                            location;
+
+                        application.status =
+                            status;
+
+                        application.applicationDate =
+                            applicationDate;
+
+                        application.interviewDate =
+                            interviewDate;
+
+                        application.interviewTime =
+                            interviewTime;
+
+                        application.salary =
+                            salary;
+
+                        application.closingDate =
+                            closingDate;
+
+                        application.jobUrl =
+                            jobUrl;
+
+                        application.notes =
+                            notes;
+                    }
+                } else {
+                    applications.push(
+                        {
+                            id: Date.now(),
+                            company,
+                            role,
+                            location,
+                            status,
+                            applicationDate,
+                            interviewDate,
+                            interviewTime,
+                            salary,
+                            closingDate,
+                            jobUrl,
+                            notes
+                        }
+                    );
+                }
+
+                saveApplications();
+
+                if (
+                    document.querySelector(
+                        ".kanban-column"
+                    )
+                ) {
+                    updateStatistics();
+                    renderApplications();
+                    updateColumnCounts();
+                }
+
+                renderApplicationsPage();
+                updateAIInbox();
+                updateUpcomingInterviews();
+                renderInterviewsPage();
+                renderAnalyticsPage();
+
+                applicationForm.reset();
+                editingApplicationId =
+                    null;
+
+                const modalTitle =
+                    document.querySelector(
+                        ".modal-header h2"
+                    );
+
+                const submitButton =
+                    document.querySelector(
+                        "#dashboard-submit-application"
+                    );
+
+                if (modalTitle) {
+                    modalTitle.textContent =
+                        "Add Job Application";
+                }
+
+                if (submitButton) {
+                    submitButton.textContent =
+                        "Add Application";
+                }
 
                 modal.classList.remove(
                     "active"
                 );
             }
-        }
-    );
-}
+        );
+    }
 
-
-/* =========================================================
-   APPLICATION FORM
-   ========================================================= */
-
-if (hasApplicationModal) {
-
-    applicationForm.addEventListener(
-        "submit",
-        event => {
-
-            event.preventDefault();
-
-
-            /* Get form values */
-
-            const company =
-                document.querySelector(
-                    "#company"
-                ).value.trim();
-
-            const role =
-                document.querySelector(
-                    "#role"
-                ).value.trim();
-
-            const location =
-                document.querySelector(
-                    "#location"
-                ).value.trim();
-
-            const status =
-                document.querySelector(
-                    "#status"
-                ).value;
-
-            const applicationDate =
-                document.querySelector(
-                    "#application-date"
-                ).value;
-
-            const interviewDate =
-                document.querySelector(
-                    "#interview-date"
-                ).value;
-
-            const interviewTime =
-                document.querySelector(
-                    "#interview-time"
-                ).value;
-
-            const salary =
-                document.querySelector(
-                    "#salary"
-                ).value.trim();
-
-            const closingDate =
-                document.querySelector(
-                    "#closing-date"
-                ).value;
-
-            const jobUrl =
-                document.querySelector(
-                    "#job-url"
-                ).value.trim();
-
-            const notes =
-                document.querySelector(
-                    "#notes"
-                ).value.trim();
-
-
-            /* Edit existing application */
+    document.addEventListener(
+        "click",
+        (event) => {
+            const target =
+                event.target;
 
             if (
-                editingApplicationId !== null
+                !(target instanceof Element)
+            )
+                return;
+
+            if (
+                target.classList.contains(
+                    "delete-btn"
+                )
             ) {
+                const applicationId =
+                    Number(
+                        target.dataset.id
+                    );
+
+                const confirmDelete =
+                    confirm(
+                        "Are you sure you want to delete this application?"
+                    );
+
+                if (!confirmDelete)
+                    return;
+
+                applications =
+                    applications.filter(
+                        (application) =>
+                            application.id !==
+                            applicationId
+                    );
+
+                saveApplications();
+
+                if (
+                    document.querySelector(
+                        ".kanban-column"
+                    )
+                ) {
+                    updateStatistics();
+                    renderApplications();
+                    updateColumnCounts();
+                }
+
+                renderApplicationsPage();
+                updateAIInbox();
+                renderInterviewsPage();
+                renderAnalyticsPage();
+            }
+
+            if (
+                target.classList.contains(
+                    "edit-btn"
+                )
+            ) {
+                const applicationId =
+                    Number(
+                        target.dataset.id
+                    );
 
                 const application =
                     applications.find(
-                        application =>
-                            application.id ===
-                            editingApplicationId
+                        (item) =>
+                            item.id ===
+                            applicationId
                     );
 
-                if (application) {
-
-                    application.company =
-                        company;
-
-                    application.role =
-                        role;
-
-                    application.location =
-                        location;
-
-                    application.status =
-                        status;
-
-                    application.applicationDate =
-                        applicationDate;
-
-                    application.interviewDate =
-                        interviewDate;
-
-                    application.interviewTime =
-                        interviewTime;
-
-                    application.salary =
-                        salary;
-
-                    application.closingDate =
-                        closingDate;
-
-                    application.jobUrl =
-                        jobUrl;
-
-                    application.notes =
-                        notes;
-                }
-
-            } else {
-
-
-                /* Create new application */
-
-                const newApplication = {
-
-                    id: Date.now(),
-
-                    company:
-                        company,
-
-                    role:
-                        role,
-
-                    location:
-                        location,
-
-                    status:
-                        status,
-
-                    applicationDate:
-                        applicationDate,
-
-                    interviewDate:
-                        interviewDate,
-
-                    interviewTime:
-                        interviewTime,
-
-                    salary:
-                        salary,
-
-                    closingDate:
-                        closingDate,
-
-                    jobUrl:
-                        jobUrl,
-
-                    notes:
-                        notes
-                };
-
-                applications.push(
-                    newApplication
-                );
-            }
-
-
-            /* Save changes */
-
-            saveApplications();
-
-
-            /* Refresh dashboard */
-
-            if (
-                document.querySelector(
-                    ".kanban-column"
+                if (
+                    !application ||
+                    !hasApplicationModal
                 )
-            ) {
+                    return;
 
-                updateStatistics();
+                editingApplicationId =
+                    applicationId;
 
-                renderApplications();
+                const company =
+                    document.querySelector(
+                        "#company"
+                    );
 
-                updateColumnCounts();
-            }
+                const role =
+                    document.querySelector(
+                        "#role"
+                    );
 
+                const location =
+                    document.querySelector(
+                        "#location"
+                    );
 
-            /* Refresh applications page */
+                const status =
+                    document.querySelector(
+                        "#status"
+                    );
 
-            renderApplicationsPage();
+                const applicationDate =
+                    document.querySelector(
+                        "#application-date"
+                    );
 
-            updateAIInbox();
+                const interviewDate =
+                    document.querySelector(
+                        "#interview-date"
+                    );
 
-            updateUpcomingInterviews();
+                const interviewTime =
+                    document.querySelector(
+                        "#interview-time"
+                    );
 
-            renderInterviewsPage();
+                const salary =
+                    document.querySelector(
+                        "#salary"
+                    );
 
-            renderAnalyticsPage();
+                const closingDate =
+                    document.querySelector(
+                        "#closing-date"
+                    );
 
+                const jobUrl =
+                    document.querySelector(
+                        "#job-url"
+                    );
 
-            /* Reset form */
+                const notes =
+                    document.querySelector(
+                        "#notes"
+                    );
 
-            applicationForm.reset();
+                if (company)
+                    company.value =
+                        application.company ||
+                        "";
 
-            editingApplicationId =
-                null;
+                if (role)
+                    role.value =
+                        application.role ||
+                        "";
 
+                if (location)
+                    location.value =
+                        application.location ||
+                        "";
 
-            /* Restore Add mode */
+                if (status)
+                    status.value =
+                        application.status ||
+                        "Applied";
 
-            const modalTitle =
-                document.querySelector(
-                    ".modal-header h2"
+                if (applicationDate)
+                    applicationDate.value =
+                        application.applicationDate ||
+                        "";
+
+                if (interviewDate)
+                    interviewDate.value =
+                        application.interviewDate ||
+                        "";
+
+                if (interviewTime)
+                    interviewTime.value =
+                        application.interviewTime ||
+                        "";
+
+                if (salary)
+                    salary.value =
+                        application.salary ||
+                        "";
+
+                if (closingDate)
+                    closingDate.value =
+                        application.closingDate ||
+                        "";
+
+                if (jobUrl)
+                    jobUrl.value =
+                        application.jobUrl ||
+                        "";
+
+                if (notes)
+                    notes.value =
+                        application.notes ||
+                        "";
+
+                const modalTitle =
+                    document.querySelector(
+                        ".modal-header h2"
+                    );
+
+                const submitButton =
+                    document.querySelector(
+                        "#dashboard-submit-application"
+                    );
+
+                if (modalTitle)
+                    modalTitle.textContent =
+                        "Edit Job Application";
+
+                if (submitButton)
+                    submitButton.textContent =
+                        "Save Changes";
+
+                modal.classList.add(
+                    "active"
                 );
-
-            const submitButton =
-                document.querySelector(
-                    "#submit-application"
-                );
-
-            if (modalTitle) {
-
-                modalTitle.textContent =
-                    "Add Job Application";
             }
-
-            if (submitButton) {
-
-                submitButton.textContent =
-                    "Add Application";
-            }
-
-            modal.classList.remove(
-                "active"
-            );
         }
     );
-}
 
-
-/* =========================================================
-   DELETE APPLICATION
-   ========================================================= */
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if (
-            !event.target.classList.contains(
-                "delete-btn"
-            )
-        ) {
-            return;
-        }
-
-        const applicationId =
-            Number(
-                event.target.dataset.id
-            );
-
-        const confirmDelete =
-            confirm(
-                "Are you sure you want to delete this application?"
-            );
-
-        if (!confirmDelete) {
-            return;
-        }
-
-        applications =
-            applications.filter(
-                application =>
-                    application.id !==
-                    applicationId
-            );
-
-        saveApplications();
-
-
-        /* Dashboard refresh */
-
-        if (
+    function renderInterviewsPage() {
+        const interviewsList =
             document.querySelector(
-                ".kanban-column"
-            )
-        ) {
-
-            updateStatistics();
-
-            renderApplications();
-
-            updateColumnCounts();
-        }
-
-
-        /* Applications page refresh */
-
-        renderApplicationsPage();
-
-        updateAIInbox();
-
-        renderInterviewsPage();
-
-        renderAnalyticsPage();
-    }
-);
-
-
-/* =========================================================
-   EDIT APPLICATION
-   ========================================================= */
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if (
-            !event.target.classList.contains(
-                "edit-btn"
-            )
-        ) {
-            return;
-        }
-
-        const applicationId =
-            Number(
-                event.target.dataset.id
+                "#interviewsList"
             );
 
-        const application =
-            applications.find(
-                application =>
-                    application.id ===
-                    applicationId
-            );
+        if (!interviewsList) return;
 
-        if (!application) {
-            return;
-        }
-
-        if (!hasApplicationModal) {
-            return;
-        }
-
-        editingApplicationId =
-            applicationId;
-
-
-        /* Fill the form */
-
-        document.querySelector(
-            "#company"
-        ).value =
-            application.company;
-
-        document.querySelector(
-            "#role"
-        ).value =
-            application.role;
-
-        document.querySelector(
-            "#location"
-        ).value =
-            application.location || "";
-
-        document.querySelector(
-            "#status"
-        ).value =
-            application.status;
-
-        document.querySelector(
-            "#application-date"
-        ).value =
-            application.applicationDate || "";
-
-        document.querySelector(
-            "#interview-date"
-        ).value =
-            application.interviewDate || "";
-
-        document.querySelector(
-            "#interview-time"
-        ).value =
-            application.interviewTime || "";
-
-        document.querySelector(
-            "#salary"
-        ).value =
-            application.salary || "";
-
-        document.querySelector(
-            "#closing-date"
-        ).value =
-            application.closingDate || "";
-
-        document.querySelector(
-            "#job-url"
-        ).value =
-            application.jobUrl || "";
-
-        document.querySelector(
-            "#notes"
-        ).value =
-            application.notes || "";
-
-
-        /* Update modal */
-
-        const modalTitle =
+        const totalElement =
             document.querySelector(
-                ".modal-header h2"
+                "#interview-total"
             );
 
-        const submitButton =
+        const upcomingElement =
             document.querySelector(
-                "#submit-application"
+                "#interview-upcoming"
             );
 
-        if (modalTitle) {
+        const todayElement =
+            document.querySelector(
+                "#interview-today"
+            );
 
-            modalTitle.textContent =
-                "Edit Job Application";
-        }
+        const completedElement =
+            document.querySelector(
+                "#interview-completed"
+            );
 
-        if (submitButton) {
+        const now =
+            new Date();
 
-            submitButton.textContent =
-                "Save Changes";
-        }
+        const today =
+            new Date();
 
-        modal.classList.add(
-            "active"
-        );
-    }
-);
-
-
-/* =========================================================
-   INTERVIEWS PAGE
-   ========================================================= */
-
-function renderInterviewsPage() {
-
-    const interviewsList =
-        document.querySelector("#interviewsList") ||
-        document.querySelector("#upcoming-interviews");
-
-    if (!interviewsList) {
-        return;
-    }
-
-
-    const totalElement =
-        document.querySelector(
-            "#interview-total"
+        today.setHours(
+            0,
+            0,
+            0,
+            0
         );
 
-    const upcomingElement =
-        document.querySelector(
-            "#interview-upcoming"
-        );
+        const interviews =
+            applications
+                .filter(
+                    (application) =>
+                        application.status ===
+                            "Interview" &&
+                        application.interviewDate
+                )
+                .map(
+                    (application) => {
+                        const dateTime =
+                            new Date(
+                                `${application.interviewDate}T${
+                                    application.interviewTime ||
+                                    "23:59"
+                                }`
+                            );
 
-    const todayElement =
-        document.querySelector(
-            "#interview-today"
-        );
+                        return {
+                            application,
+                            dateTime
+                        };
+                    }
+                )
+                .sort(
+                    (a, b) =>
+                        a.dateTime -
+                        b.dateTime
+                );
 
-    const completedElement =
-        document.querySelector(
-            "#interview-completed"
-        );
+        const upcoming =
+            interviews.filter(
+                (interview) =>
+                    interview.dateTime >=
+                    now
+            );
 
-
-    const now =
-        new Date();
-
-    const today =
-        new Date();
-
-    today.setHours(
-        0,
-        0,
-        0,
-        0
-    );
-
-
-    const interviews =
-        applications
-            .filter(
-                application =>
-                    application.status === "Interview" &&
-                    application.interviewDate
-            )
-            .map(
-                application => {
-
-                    const dateTime =
+        const todayInterviews =
+            interviews.filter(
+                (interview) => {
+                    const interviewDay =
                         new Date(
-                            `${application.interviewDate}T${application.interviewTime || "23:59"}`
+                            `${interview.application.interviewDate}T00:00:00`
                         );
 
-                    return {
-                        application,
-                        dateTime
-                    };
-                }
-            )
-            .sort(
-                (a, b) =>
-                    a.dateTime -
-                    b.dateTime
-            );
-
-
-    const upcoming =
-        interviews.filter(
-            interview =>
-                interview.dateTime >= now
-        );
-
-
-    const todayInterviews =
-        interviews.filter(
-            interview => {
-
-                const interviewDay =
-                    new Date(
-                        `${interview.application.interviewDate}T00:00:00`
+                    interviewDay.setHours(
+                        0,
+                        0,
+                        0,
+                        0
                     );
 
-                interviewDay.setHours(
-                    0,
-                    0,
-                    0,
-                    0
+                    return (
+                        interviewDay.getTime() ===
+                        today.getTime()
+                    );
+                }
+            );
+
+        const completed =
+            interviews.filter(
+                (interview) =>
+                    interview.dateTime <
+                    now
+            );
+
+        if (totalElement)
+            totalElement.textContent =
+                String(
+                    interviews.length
                 );
 
-                return (
-                    interviewDay.getTime() ===
-                    today.getTime()
-                );
-            }
-        );
-
-
-    const completed =
-        interviews.filter(
-            interview =>
-                interview.dateTime < now
-        );
-
-
-    if (totalElement) {
-        totalElement.textContent =
-            interviews.length;
-    }
-
-    if (upcomingElement) {
-        upcomingElement.textContent =
-            upcoming.length;
-    }
-
-    if (todayElement) {
-        todayElement.textContent =
-            todayInterviews.length;
-    }
-
-    if (completedElement) {
-        completedElement.textContent =
-            completed.length;
-    }
-
-
-    if (interviews.length === 0) {
-
-        interviewsList.innerHTML = `
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    +
-                </div>
-
-                <h3>
-                    No interviews scheduled
-                </h3>
-
-                <p>
-                    Add an interview date and time
-                    to an application to see it here.
-                </p>
-
-            </div>
-        `;
-
-        return;
-    }
-
-
-    interviewsList.innerHTML = "";
-
-
-    interviews.forEach(
-        ({ application, dateTime }) => {
-
-            const card =
-                document.createElement("div");
-
-            card.className =
-                "interview-card";
-
-
-            const date =
-                dateTime.toLocaleDateString(
-                    undefined,
-                    {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric"
-                    }
+        if (upcomingElement)
+            upcomingElement.textContent =
+                String(
+                    upcoming.length
                 );
 
+        if (todayElement)
+            todayElement.textContent =
+                String(
+                    todayInterviews.length
+                );
 
-            const time =
-                application.interviewTime
-                    ? dateTime.toLocaleTimeString(
-                        undefined,
-                        {
-                            hour: "numeric",
-                            minute: "2-digit"
-                        }
-                    )
-                    : "Time not set";
+        if (completedElement)
+            completedElement.textContent =
+                String(
+                    completed.length
+                );
 
-
-            const completedLabel =
-                dateTime < now
-                    ? "COMPLETED"
-                    : "UPCOMING";
-
-
-            card.innerHTML = `
-                <div class="interview-card-header">
-
-                    <div>
-
-                        <h3>
-                            ${application.company}
-                        </h3>
-
-                        <p>
-                            ${application.role}
-                        </p>
-
-                    </div>
-
-                    <span>
-                        ${completedLabel}
-                    </span>
-
-                </div>
-
-                <div class="interview-details">
-
-                    <p>
-                        📅 ${date}
-                    </p>
-
-                    <p>
-                        🕒 ${time}
-                    </p>
-
-                    ${
-                        application.location
-                            ? `
-                                <p>
-                                    📍 ${application.location}
-                                </p>
-                            `
-                            : ""
-                    }
-
+        if (
+            interviews.length ===
+            0
+        ) {
+            interviewsList.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">+</div>
+                    <h3>No interviews scheduled</h3>
+                    <p>Add an interview date and time to an application to see it here.</p>
                 </div>
             `;
 
-            interviewsList.appendChild(card);
+            return;
         }
-    );
-}
 
+        interviewsList.innerHTML =
+            "";
 
-/* =========================================================
-   ANALYTICS PAGE
-   ========================================================= */
+        interviews.forEach(
+            ({
+                application,
+                dateTime
+            }) => {
+                const card =
+                    document.createElement(
+                        "div"
+                    );
 
-function renderAnalyticsPage() {
+                card.className =
+                    "interview-card";
 
-    const breakdown =
-        document.querySelector(
-            "#analytics-breakdown"
-        );
+                const date =
+                    dateTime.toLocaleDateString(
+                        undefined,
+                        {
+                            weekday:
+                                "long",
+                            day:
+                                "numeric",
+                            month:
+                                "long",
+                            year:
+                                "numeric"
+                        }
+                    );
 
-    if (!breakdown) {
-        return;
-    }
+                const time =
+                    application.interviewTime
+                        ? dateTime.toLocaleTimeString(
+                              undefined,
+                              {
+                                  hour:
+                                      "numeric",
+                                  minute:
+                                      "2-digit"
+                              }
+                          )
+                        : "Time not set";
 
+                const completedLabel =
+                    dateTime < now
+                        ? "COMPLETED"
+                        : "UPCOMING";
 
-    const total =
-        applications.length;
-
-
-    const applied =
-        applications.filter(
-            application =>
-                application.status === "Applied"
-        ).length;
-
-
-    const assessment =
-        applications.filter(
-            application =>
-                application.status === "Assessment"
-        ).length;
-
-
-    const interviews =
-        applications.filter(
-            application =>
-                application.status === "Interview"
-        ).length;
-
-
-    const offers =
-        applications.filter(
-            application =>
-                application.status === "Offer"
-        ).length;
-
-
-    const rejected =
-        applications.filter(
-            application =>
-                application.status === "Rejected"
-        ).length;
-
-
-    const active =
-        applied +
-        assessment +
-        interviews;
-
-
-    const responses =
-        assessment +
-        interviews +
-        offers +
-        rejected;
-
-
-    const responseRate =
-        total > 0
-            ? Math.round(
-                (responses / total) * 100
-            )
-            : 0;
-
-
-    const interviewRate =
-        total > 0
-            ? Math.round(
-                (interviews / total) * 100
-            )
-            : 0;
-
-
-    const offerRate =
-        total > 0
-            ? Math.round(
-                (offers / total) * 100
-            )
-            : 0;
-
-
-    /* Update summary */
-
-    const analyticsTotal =
-        document.querySelector(
-            "#analytics-total"
-        );
-
-    const analyticsActive =
-        document.querySelector(
-            "#analytics-active"
-        );
-
-    const analyticsInterviews =
-        document.querySelector(
-            "#analytics-interviews"
-        );
-
-    const analyticsOffers =
-        document.querySelector(
-            "#analytics-offers"
-        );
-
-    const analyticsResponseRate =
-        document.querySelector(
-            "#analytics-response-rate"
-        );
-
-    const analyticsInterviewRate =
-        document.querySelector(
-            "#analytics-interview-rate"
-        );
-
-    const analyticsOfferRate =
-        document.querySelector(
-            "#analytics-offer-rate"
-        );
-
-
-    if (analyticsTotal) {
-
-        analyticsTotal.textContent =
-            total;
-    }
-
-    if (analyticsActive) {
-
-        analyticsActive.textContent =
-            active;
-    }
-
-    if (analyticsInterviews) {
-
-        analyticsInterviews.textContent =
-            interviews;
-    }
-
-    if (analyticsOffers) {
-
-        analyticsOffers.textContent =
-            offers;
-    }
-
-    if (analyticsResponseRate) {
-
-        analyticsResponseRate.textContent =
-            `${responseRate}%`;
-    }
-
-    if (analyticsInterviewRate) {
-
-        analyticsInterviewRate.textContent =
-            `${interviewRate}%`;
-    }
-
-    if (analyticsOfferRate) {
-
-        analyticsOfferRate.textContent =
-            `${offerRate}%`;
-    }
-
-
-    /* Empty state */
-
-    if (total === 0) {
-
-        breakdown.innerHTML = `
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    +
+                card.innerHTML = `
+                <div class="interview-card-header">
+                    <div>
+                        <h3>${escapeHTML(
+                            application.company
+                        )}</h3>
+                        <p>${escapeHTML(
+                            application.role
+                        )}</p>
+                    </div>
+                    <span>${completedLabel}</span>
                 </div>
 
-                <h3>
-                    No analytics yet
-                </h3>
+                <div class="interview-details">
+                    <p>📅 ${escapeHTML(
+                        date
+                    )}</p>
+                    <p>🕒 ${escapeHTML(
+                        time
+                    )}</p>
+                    ${
+                        application.location
+                            ? `<p>📍 ${escapeHTML(
+                                  application.location
+                              )}</p>`
+                            : ""
+                    }
+                </div>
+            `;
 
-                <p>
-                    Add applications to start
-                    generating career insights.
-                </p>
-
-            </div>
-        `;
-
-        return;
+                interviewsList.appendChild(
+                    card
+                );
+            }
+        );
     }
 
+    function renderAnalyticsPage() {
+        const breakdown =
+            document.querySelector(
+                "#analytics-breakdown"
+            );
 
-    /* Application breakdown */
+        if (!breakdown) return;
 
-    const stages = [
+        const total =
+            applications.length;
 
-        {
-            label: "Applied",
-            count: applied
-        },
+        const applied =
+            applications.filter(
+                (application) =>
+                    application.status ===
+                    "Applied"
+            ).length;
 
-        {
-            label: "Assessment",
-            count: assessment
-        },
+        const assessment =
+            applications.filter(
+                (application) =>
+                    application.status ===
+                    "Assessment"
+            ).length;
 
-        {
-            label: "Interview",
-            count: interviews
-        },
+        const interviews =
+            applications.filter(
+                (application) =>
+                    application.status ===
+                    "Interview"
+            ).length;
 
-        {
-            label: "Offer",
-            count: offers
-        },
+        const offers =
+            applications.filter(
+                (application) =>
+                    application.status ===
+                    "Offer"
+            ).length;
 
-        {
-            label: "Rejected",
-            count: rejected
+        const rejected =
+            applications.filter(
+                (application) =>
+                    application.status ===
+                    "Rejected"
+            ).length;
+
+        const active =
+            applied +
+            assessment +
+            interviews;
+
+        const responses =
+            assessment +
+            interviews +
+            offers +
+            rejected;
+
+        const responseRatePct =
+            total > 0
+                ? Math.round(
+                      (responses /
+                          total) *
+                          100
+                  )
+                : 0;
+
+        const interviewRatePct =
+            total > 0
+                ? Math.round(
+                      (interviews /
+                          total) *
+                          100
+                  )
+                : 0;
+
+        const offerRatePct =
+            total > 0
+                ? Math.round(
+                      (offers /
+                          total) *
+                          100
+                  )
+                : 0;
+
+        const analyticsTotal =
+            document.querySelector(
+                "#analytics-total"
+            );
+
+        const analyticsActive =
+            document.querySelector(
+                "#analytics-active"
+            );
+
+        const analyticsInterviews =
+            document.querySelector(
+                "#analytics-interviews"
+            );
+
+        const analyticsOffers =
+            document.querySelector(
+                "#analytics-offers"
+            );
+
+        const analyticsResponseRate =
+            document.querySelector(
+                "#analytics-response-rate"
+            );
+
+        const analyticsInterviewRate =
+            document.querySelector(
+                "#analytics-interview-rate"
+            );
+
+        const analyticsOfferRate =
+            document.querySelector(
+                "#analytics-offer-rate"
+            );
+
+        if (analyticsTotal)
+            analyticsTotal.textContent =
+                String(total);
+
+        if (analyticsActive)
+            analyticsActive.textContent =
+                String(active);
+
+        if (analyticsInterviews)
+            analyticsInterviews.textContent =
+                String(interviews);
+
+        if (analyticsOffers)
+            analyticsOffers.textContent =
+                String(offers);
+
+        if (analyticsResponseRate)
+            analyticsResponseRate.textContent =
+                `${responseRatePct}%`;
+
+        if (analyticsInterviewRate)
+            analyticsInterviewRate.textContent =
+                `${interviewRatePct}%`;
+
+        if (analyticsOfferRate)
+            analyticsOfferRate.textContent =
+                `${offerRatePct}%`;
+
+        if (total === 0) {
+            breakdown.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">+</div>
+                    <h3>No analytics yet</h3>
+                    <p>Add applications to start generating career insights.</p>
+                </div>
+            `;
+
+            return;
         }
 
-    ];
+        const stages = [
+            {
+                label: "Applied",
+                count: applied
+            },
+            {
+                label: "Assessment",
+                count: assessment
+            },
+            {
+                label: "Interview",
+                count: interviews
+            },
+            {
+                label: "Offer",
+                count: offers
+            },
+            {
+                label: "Rejected",
+                count: rejected
+            }
+        ];
 
+        breakdown.innerHTML = `
+            <div class="analytics-breakdown">
+                ${stages
+                    .map((stage) => {
+                        const percentage =
+                            (stage.count /
+                                total) *
+                            100;
 
-    breakdown.innerHTML = `
-        <div class="analytics-breakdown">
-
-            ${stages.map(
-                stage => {
-
-                    const percentage =
-                        (stage.count / total) * 100;
-
-                    return `
+                        return `
                         <div class="analytics-row">
-
-                            <div class="analytics-label">
-                                ${stage.label}
-                            </div>
-
+                            <div class="analytics-label">${escapeHTML(
+                                stage.label
+                            )}</div>
                             <div class="analytics-bar">
-
-                                <div
-                                    class="analytics-bar-fill"
-                                    style="width: ${percentage}%"
-                                ></div>
-
+                                <div class="analytics-bar-fill" style="width: ${percentage}%"></div>
                             </div>
-
-                            <div class="analytics-count">
-                                ${stage.count}
-                            </div>
-
+                            <div class="analytics-count">${stage.count}</div>
                         </div>
                     `;
-                }
-            ).join("")}
+                    })
+                    .join("")}
+            </div>
+        `;
+    }
 
-        </div>
-    `;
-}
+    function initializeApp() {
+        const hasKanban =
+            !!document.querySelector(
+                ".kanban-column"
+            );
 
+        const hasApplicationsPage =
+            !!document.querySelector(
+                "#applicationsList"
+            );
 
-/* =========================================================
-   INITIAL PAGE LOAD
-   ========================================================= */
+        const hasInterviewsPage =
+            !!document.querySelector(
+                "#interviewsList"
+            );
 
-if (
-    document.querySelector(
-        ".kanban-column"
-    )
-) {
+        const hasUpcomingInterviews =
+            !!document.querySelector(
+                "#upcoming-interviews"
+            );
 
-    updateStatistics();
+        const hasAnalyticsPage =
+            !!document.querySelector(
+                "#analytics-breakdown"
+            );
 
-    renderApplications();
+        const hasAIInbox =
+            !!document.querySelector(
+                "#ai-content"
+            );
 
-    updateColumnCounts();
-}
+        if (hasKanban) {
+            updateStatistics();
+            renderApplications();
+            updateColumnCounts();
+        }
 
-renderApplicationsPage();
+        if (hasApplicationsPage) {
+            renderApplicationsPage();
+        }
 
-updateAIInbox();
+        if (hasAIInbox) {
+            updateAIInbox();
+        }
 
-updateUpcomingInterviews();
+        if (hasUpcomingInterviews) {
+            updateUpcomingInterviews();
+        }
 
-renderInterviewsPage();
+        if (hasInterviewsPage) {
+            renderInterviewsPage();
+        }
 
-renderAnalyticsPage();
+        if (hasAnalyticsPage) {
+            renderAnalyticsPage();
+        }
 
-updateGreeting();
+        updateGreeting();
+        initializeCVProfile();
+    }
+
+    const connectGmailButton =
+        document.querySelector(
+            "#connect-gmail"
+        );
+
+    if (connectGmailButton) {
+        connectGmailButton.addEventListener(
+            "click",
+            connectGmail
+        );
+    }
+
+    initializeApp();
+
+    console.log(
+        "JobTsela JavaScript loaded successfully."
+    );
+})();
